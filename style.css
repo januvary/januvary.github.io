@@ -1,0 +1,861 @@
+/* --- Global Styles & Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+:root {
+    /* Dark Mode Palette */
+    --bg-color: #1e1e1e;
+    --panel-bg: #2d2d2d;
+    --primary-color: #4dabf7; /* Bright Blue */
+    --secondary-color: #69db7c; /* Bright Green */
+    --accent-color: #ffc078; /* Orange/Yellow */
+    --lox-color: #ba88e0; /* Purple */
+    --cyp-color: #40c0b0; /* Teal */
+    --resolution-color: #66bb6a; /* Brighter Green for Lipoxins */
+    --text-color: #e0e0e0;
+    --border-color: #4a4a4a;
+    --shadow-color: rgba(0, 0, 0, 0.4);
+    --enzyme-bg: #2a3f31; /* Darker green base */
+    --enzyme-border: #4a7c59;
+    --mediator-bg: #4d332f; /* Darker red base */
+    --mediator-border: #82544e;
+    --intermediate-bg: #373737;
+    --intermediate-border: #555555;
+    --aa-bg: #4d472c; /* Darker yellow base */
+    --aa-border: #7a7046;
+    --membrane-bg: #2a3f31; /* Same as enzyme for consistency */
+    --membrane-border: #4a7c59;
+    --inhibited-overlay: rgba(255, 80, 80, 0.45);
+    --tooltip-bg: #383838;
+    --tooltip-text: #f0f0f0;
+    --sub-pathway-bg: #252525;
+    --nested-tooltip-bg: var(--secondary-color);
+    --readout-tooltip-bg: #454545;
+
+    --pc-base-font-size: 13px; /* For compact PC view */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 20px;
+    font-size: 15px;
+    -webkit-tap-highlight-color: transparent;
+}
+h1, h2, h3 { text-align: center; margin-bottom: 15px; font-weight: 700; }
+h1 { color: var(--primary-color); font-size: 1.8em; }
+h2 { color: var(--secondary-color); margin-top: 15px; font-size: 1.4em; border-bottom: 1px solid var(--border-color); padding-bottom: 5px;}
+h3 { color: var(--text-color); text-align: left; margin-bottom: 8px; font-size: 1.1em;}
+
+/* Text visibility defaults (Desktop) */
+.mobile-text { display: none; }
+.desktop-text { display: inline; } 
+/* Ensure spans within H2 and buttons display inline by default for desktop */
+h2.panel-toggle > .desktop-text,
+button > .desktop-text {
+    display: inline;
+}
+h2.panel-toggle > .mobile-text,
+button > .mobile-text {
+    display: none; /* Explicitly hide mobile text on desktop */
+}
+
+/* --- Layout Containers --- */
+.main-container { max-width: 1450px; margin: 20px auto; background-color: var(--panel-bg); border-radius: 12px; box-shadow: 0 8px 25px var(--shadow-color); padding: 30px; display: flex; flex-direction: column; }
+.cascade-diagram-area {
+    display: flex; flex-direction: column; align-items: center;
+    position: relative; margin-bottom: 30px;
+}
+.panels-container { margin-top: 20px; }
+
+/* --- Core Cascade Elements --- */
+.membrane {
+    background-color: var(--membrane-bg);
+    border: 2px dashed var(--membrane-border);
+    border-radius: 8px;
+    padding: 10px; /* Adjusted padding */
+    margin-bottom: 15px;
+    width: fit-content;
+    min-width: 180px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center items horizontally */
+    gap: 10px; /* Space between text and PLA2 box */
+}
+#trigger-btn {
+    display: block; margin: 0 auto 15px auto; padding: 10px 20px;
+    background-image: linear-gradient(to bottom, var(--secondary-color), #4CAF50); /* Dark mode friendly green */
+    color: #ffffff; border: none; border-radius: 25px; cursor: pointer;
+    font-size: 0.95em; font-weight: bold; box-shadow: 0 3px 8px rgba(0,0,0, 0.3);
+    transition: all 0.3s ease;
+}
+#trigger-btn:hover:not(:disabled) {
+    background-image: linear-gradient(to bottom, #69db7c, #5cb85c);
+    box-shadow: 0 5px 12px rgba(0,0,0, 0.4); transform: translateY(-2px);
+}
+#trigger-btn:disabled {
+    background-image: none; background-color: #555; color: #999;
+    cursor: not-allowed; box-shadow: none; transform: none;
+}
+.arrow-down { width: 2px; height: 20px; background-color: #777; margin: 5px auto; position: relative; display: none; }
+.arrow-down::after { content: ''; position: absolute; left: 50%; bottom: -2px; transform: translateX(-50%) rotate(45deg); width: 8px; height: 8px; border-bottom: 2px solid #777; border-right: 2px solid #777; }
+#aa-pool { background-color: var(--aa-bg); border: 2px solid var(--aa-border); text-align: center; font-weight: bold; width: fit-content; padding: 10px 18px; display: none; border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color); margin-top: 5px; color: #f0f0f0; }
+
+/* --- Pathways Layout & Styling --- */
+.pathways-container { display: none; width: 100%; margin-top: 5px; padding-top: 15px; border-top: 1px solid var(--border-color); position: relative; }
+.pathways-flex { display: flex; justify-content: space-around; align-items: stretch; flex-wrap: wrap; width: 100%; gap: 15px; }
+.pathways-container::before, .pathways-container::after, .pathways-container > .pathways-flex::after { content: ''; position: absolute; top: 0; height: 15px; width: 2px; background-color: #777; display: block; z-index: 0;}
+.pathways-container::before { left: calc(16.66% + 7px); transform: translateX(-50%); }
+.pathways-container::after { left: 50%; transform: translateX(-50%); }
+.pathways-container > .pathways-flex::after { left: calc(83.33% - 7px); transform: translateX(-50%); }
+
+.pathway { border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin: 0; flex: 1 1 30%; min-width: 260px; text-align: center; background-color: var(--panel-bg); box-shadow: 0 4px 12px var(--shadow-color); display: flex; flex-direction: column; align-items: center; }
+.pathway h2.pathway-title { margin-bottom: 15px; font-size: 1.2em; }
+.cox-pathway { border-top: 4px solid var(--accent-color); } .cox-pathway h2.pathway-title { color: var(--accent-color); }
+.lox-pathway { border-top: 4px solid var(--lox-color); } .lox-pathway h2.pathway-title { color: var(--lox-color); }
+.cyp-pathway { border-top: 4px solid var(--cyp-color); } .cyp-pathway h2.pathway-title { color: var(--cyp-color); }
+.sub-pathway { border: 1px dashed var(--border-color); background-color: var(--sub-pathway-bg); border-radius: 6px; padding: 10px; margin-top: 10px; width: 95%; display: flex; flex-direction: column; align-items: center; }
+.sub-pathway h3 { font-size: 0.95em; color: #ccc; margin-bottom: 8px; border-bottom: 1px solid #444; padding-bottom: 4px;}
+
+/* --- Nodes & Main Tooltip Container --- */
+.node {
+    border-radius: 5px; padding: 7px 12px; margin: 6px auto;
+    cursor: pointer; transition: all 0.3s ease; width: fit-content; max-width: 95%;
+    position: relative; box-shadow: 0 1px 3px var(--shadow-color);
+    font-size: 0.85em; line-height: 1.3;
+    user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+}
+body:not(.mobile) .node:hover:not(.inhibited) {
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: 0 2px 5px var(--shadow-color);
+}
+.node.mobile-tooltip-active {
+    transform: scale(1.01);
+    box-shadow: 0 0 6px var(--primary-color), 0 0 9px var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
+
+.enzyme { background-color: var(--enzyme-bg); border: 2px solid var(--enzyme-border); color: #a5d6a7; font-weight: bold; }
+.synthase { background-color: #2c3a47; border: 2px solid #4e6e8e; color: #90caf9; font-style: italic; }
+.accessory-protein { background-color: #4a4532; border: 2px solid #82774c; color: #ffe082; font-weight: 500; font-size: 0.8em; }
+.mediator { background-color: var(--mediator-bg); border: 2px solid var(--mediator-border); color: #ef9a9a; border-radius: 15px; padding: 6px 12px;}
+.intermediate { background-color: var(--intermediate-bg); border: 2px dashed var(--intermediate-border); color: #bdbdbd; font-style: italic; border-radius: 3px; }
+.lipoxin { background-color: var(--resolution-color); border: 2px solid #81c784; color: #ffffff; font-weight: bold; border-radius: 15px; padding: 6px 12px;}
+#pla2 {
+    position: static; /* Changed from absolute */
+    font-size: 0.75em;
+    padding: 3px 6px;
+    background-color: rgba(40,40,40, 0.8); /* Kept specific background */
+    border: 1px solid var(--enzyme-border); /* Kept specific border */
+}
+.mediator-group { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 10px; width: 100%; }
+.synthase-mediator-pair { display: flex; align-items: center; justify-content: center; gap: 4px; width: 100%; margin-bottom: 4px;}
+.synthase-mediator-pair .connector-arrow { color: var(--border-color); font-size: 1.1em; line-height: 1; }
+.connector { font-style: italic; color: #9e9e9e; margin: 6px 0; position: relative; padding: 8px 0; width: 100%; font-size: 0.8em; }
+.connector::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 2px; height: 20px; background-color: #777; z-index: -1; }
+
+/* --- JS-Powered Main Tooltip Styling --- */
+#main-tooltip {
+    position: absolute; background-color: var(--tooltip-bg); color: var(--tooltip-text);
+    padding: 10px 12px; border-radius: 5px; font-size: 0.85em; line-height: 1.4;
+    width: auto; min-width: 220px; max-width: 320px; text-align: left;
+    visibility: hidden; opacity: 0;
+    transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.2s ease;
+    z-index: 1000; box-shadow: 0 3px 7px rgba(0,0,0,0.3);
+}
+#main-tooltip h3 { color: var(--secondary-color); font-size: 1em; margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; text-align: left;}
+#main-tooltip p { margin: 0; }
+
+/* --- Nested Tooltip Styling --- */
+.tooltip-term { text-decoration: underline dotted var(--nested-tooltip-bg); cursor: help; position: relative; color: var(--primary-color); font-weight: 500;} /* Brighter color for terms */
+#main-tooltip .tooltip-term::after { /* MODIFIED: Added #main-tooltip scope */
+    content: attr(data-term-info); position: absolute; left: 50%; transform: translateX(-50%);
+    bottom: calc(100% + 5px); background-color: var(--nested-tooltip-bg); color: #111; /* Darker text for contrast on bright bg */
+    padding: 4px 7px; border-radius: 3px; font-size: 0.8em; line-height: 1.3;
+    width: max-content; max-width: 220px; text-align: center;
+    visibility: hidden; opacity: 0; transition: opacity 0.25s ease, visibility 0.25s ease;
+    z-index: 1010; pointer-events: none; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+ #main-tooltip .tooltip-term::before { /* MODIFIED: Added #main-tooltip scope */
+     content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+     border-width: 4px; border-style: solid; border-color: var(--nested-tooltip-bg) transparent transparent transparent;
+     visibility: hidden; opacity: 0; transition: opacity 0.25s ease, visibility 0.25s ease;
+     z-index: 1010; pointer-events: none;
+ }
+ body:not(.mobile) #main-tooltip .tooltip-term:hover::after, body:not(.mobile) #main-tooltip .tooltip-term:hover::before { visibility: visible; opacity: 1; } /* MODIFIED: Added #main-tooltip scope */
+ .mobile #main-tooltip .tooltip-term.active-nested-tooltip::after, .mobile #main-tooltip .tooltip-term.active-nested-tooltip::before { visibility: visible; opacity: 1; } /* MODIFIED: Added #main-tooltip scope */
+
+/* --- Control & Readout Panels --- */
+.panel { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-top: 20px; box-shadow: 0 3px 10px var(--shadow-color); }
+.panel h2 { border-bottom: 1px solid var(--border-color); padding-bottom: 6px; font-size: 1.2em; }
+.control-panel button, .aa-modulators-panel .panel-content button, .other-drugs-panel .panel-content button { /* Applied to new panel content buttons too */
+    margin: 5px 6px; padding: 8px 15px; border: 1px solid var(--border-color);
+    border-radius: 18px; cursor: pointer; background-color: #3a3a3a;
+    color: var(--text-color); font-weight: 400; transition: all 0.25s ease; font-size: 0.9em;
+}
+.control-panel button:hover, .aa-modulators-panel .panel-content button:hover, .other-drugs-panel .panel-content button:hover {
+    background-color: #4f4f4f; border-color: #666; transform: translateY(-1px);
+}
+#reset-btn { background-color: #c0392b; color: white; border-color: #c0392b; }
+#reset-btn:hover { background-color: #a93226; border-color: #a93226; }
+
+/* --- Enhanced Readout Display & Tooltip --- */
+.readout-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 12px; }
+.readout-item { background-color: #333; border: 1px solid var(--border-color); border-radius: 5px; padding: 10px; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,0.2); position: relative; /* cursor: help; NO - info icon is help */ transition: background-color 0.25s ease; }
+.readout-label { font-weight: bold; color: var(--text-color); margin-bottom: 6px; font-size: 0.9em; }
+.readout-bar-container { width: 100%; height: 15px; background-color: #444; border-radius: 7px; overflow: hidden; margin-bottom: 6px; border: 1px solid #555; }
+.readout-bar { height: 100%; width: 50%; border-radius: 7px; transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out; }
+.readout-status { font-weight: bold; text-align: right; font-size: 0.85em; margin-top: auto; transition: color 0.25s ease; }
+
+/* Bar Widths & Status Colors */
+.status-normal .readout-bar, .status-balanced .readout-bar { width: 50%; } .status-reduced .readout-bar { width: 30%; } .status-slightly-reduced .readout-bar { width: 40%; } .status-very-reduced .readout-bar { width: 10%; } .status-increased .readout-bar { width: 75%; } .status-constricted .readout-bar { width: 85%; } .status-vasoconstricted .readout-bar { width: 90%; } .status-dilated .readout-bar { width: 15%; } .status-vasodilated .readout-bar { width: 10%; } .status-impaired .readout-bar { width: 20%; } .status-promoting .readout-bar { width: 70%; } .status-suppressed .readout-bar { width: 25%; } .status-mixed .readout-bar { width: 50%; background: linear-gradient(90deg, var(--accent-color) 50%, var(--primary-color) 50%);}
+.status-increased-risk .readout-bar { width: 65%; } /* For Platelets with COX2i */
+.status-reduced-activity .readout-bar { width: 35%; } /* For Beta-Blocker CV Tone */
+.status-reduced-renin .readout-bar { width: 40%; } /* For Beta-Blocker Kidney */
+.status-risk-of-cough .readout-bar { width: 50%; background: linear-gradient(90deg, #ffcc80 50%, #90a4ae 50%);} /* For ACEi Bronchi */
+.status-altered-often-protective .readout-bar { width: 60%; } /* For ACEi Kidney */
+.status-altered-often-neutral-beneficial .readout-bar { width: 55%; } /* For CCB Kidney */
+.status-relaxed .readout-bar { width: 20%; } /* For CCB Uterus, similar to dilated */
+.status-risk-of-impairment .readout-bar { width: 25%; } /* For Corticosteroid Kidney */
+.status-slightly-impaired .readout-bar { width: 30%; } /* For Aspirin Kidney */
+
+
+/* Status Colors (adjusted for dark mode if needed, primarily affecting bar and text color) */
+.status-normal .readout-bar, .status-normal { background-color: #26a69a; color: var(--text-color); } /* Tealish green */
+.status-reduced .readout-bar, .status-reduced { background-color: #ffa726; color: var(--text-color); } /* Orange */
+.status-slightly-reduced .readout-bar, .status-slightly-reduced { background-color: #ffb74d; color: var(--text-color); } /* Lighter Orange */
+.status-very-reduced .readout-bar, .status-very-reduced { background-color: #42a5f5; color: var(--text-color); } /* Blue */
+.status-increased .readout-bar, .status-increased { background-color: #ef5350; color: var(--text-color); } /* Red */
+.status-constricted .readout-bar, .status-constricted { background-color: #d32f2f; color: var(--text-color); } /* Darker Red */
+.status-vasoconstricted .readout-bar, .status-vasoconstricted { background-color: #e53935; color: var(--text-color); } /* Red */
+.status-dilated .readout-bar, .status-dilated { background-color: #66bb6a; color: var(--text-color); } /* Green */
+.status-vasodilated .readout-bar, .status-vasodilated { background-color: #29b6f6; color: var(--text-color); } /* Light Blue */
+.status-impaired .readout-bar, .status-impaired { background-color: #ff7043; color: var(--text-color); } /* Deep Orange */
+.status-promoting .readout-bar, .status-promoting { background-color: var(--resolution-color); color: var(--text-color); }
+.status-suppressed .readout-bar, .status-suppressed { background-color: #90a4ae; color: var(--text-color); } /* Blue Grey */
+.status-balanced .readout-bar, .status-balanced { background-color: #78909c; color: var(--text-color); } /* Blue Grey */
+.status-mixed { color: #ccc; } /* Lighter grey text for mixed status */
+.status-increased-risk .readout-bar, .status-increased-risk { background-color: #ff8a65; color: var(--text-color); } /* Coral for increased risk */
+.status-reduced-activity .readout-bar, .status-reduced-activity { background-color: #81d4fa; color: var(--text-color); } /* Light blue for reduced activity */
+.status-reduced-renin .readout-bar, .status-reduced-renin { background-color: #a1887f; color: var(--text-color); } /* Brownish for renin */
+.status-risk-of-cough { color: var(--text-color); } /* Light orange text for cough risk */
+.status-altered-often-protective .readout-bar, .status-altered-often-protective { background-color: #4db6ac; color: var(--text-color); } /* Teal variant for protective kidney */
+.status-altered-often-neutral-beneficial .readout-bar, .status-altered-often-neutral-beneficial { background-color: #7986cb; color: var(--text-color)var(--text-color); } /* Indigo variant for neutral/beneficial kidney */
+.status-relaxed .readout-bar, .status-relaxed { background-color: #9575cd; color: var(--text-color); } /* Deep purple for relaxed (uterus) */
+.status-risk-of-impairment .readout-bar, .status-risk-of-impairment { background-color: #f06292; color: var(--text-color); } /* Pink for risk of impairment */
+.status-slightly-impaired .readout-bar, .status-slightly-impaired { background-color: #ffd54f; color: var(--text-color); } /* Amber for slightly impaired */
+
+
+.readout-status { background-color: transparent !important; }
+
+/* --- Inhibition Style --- */
+.inhibited { cursor: not-allowed !important; background-image: repeating-linear-gradient(-45deg, transparent, transparent 4px, var(--inhibited-overlay) 4px, var(--inhibited-overlay) 8px) !important; border: 2px dashed #e53935 !important; color: #999 !important; box-shadow: none !important; transform: none !important; }
+.inhibited::before, .inhibited::after { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+.inhibited .enzyme-text, .inhibited .mediator-text, .inhibited .intermediate-text, .inhibited .accessory-text { opacity: 0.5; }
+
+/* Visibility helpers for desktop/mobile only elements */
+.desktop-only { display: block; }
+.mobile-only { display: none; }
+
+/* --- Responsiveness & Mobile --- */
+@media (max-width: 1299px) {
+    /* No specific changes for 1299px needed now based on new mobile-first logic for 768px */
+    @media (max-width: 1200px) {
+        /* Desktop-like but smaller screen pathway adjustments */
+        .pathway { flex-basis: 45%; min-width: calc(50% - 15px); }
+        .pathways-container::before { left: 25%; }
+        .pathways-container::after { left: 75%; }
+        .pathways-container > .pathways-flex::after { display: none; }
+        .main-container { padding: 20px; }
+    }
+
+    @media (max-width: 768px) {
+        /* --- Mobile App-like Layout Option B --- */
+        html, body {
+            height: auto; /* Allow normal page scrolling */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-y: auto;
+            padding: 0; /* Remove body padding for full width experience */
+        }
+        body { font-size: 14px; /* Padding removed above */ -webkit-tap-highlight-color: transparent;}
+        
+        /* Text visibility for mobile */
+        .mobile-text { display: inline !important; } 
+        .desktop-text { display: none !important; } 
+
+        /* Specific for panel titles and buttons if spans are direct children on mobile */
+        h2.panel-toggle > .mobile-text,
+        button > .mobile-text {
+            display: inline !important; 
+        }
+        h2.panel-toggle > .desktop-text,
+        button > .desktop-text {
+            display: none !important;
+        }
+
+        .main-container {
+            flex-direction: column; /* Ensure it stacks vertically */
+            height: auto; /* Allow content to define height */
+            padding: 10px; /* Main padding for mobile content */
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        .diagram-column, .panels-column {
+            width: 100%;
+            border-right: none; /* Remove desktop border */
+            padding-right: 0;
+            padding-left: 0;
+        }
+        .cascade-diagram-area {
+            margin-bottom: 15px; /* Space before pathway selector */
+        }
+        h1 {font-size: 1.4em; margin-bottom: 10px;}
+        h2 {font-size: 1.1em; margin-bottom: 10px;} /* General h2 for mobile */
+        h3 {font-size: 0.95em;}
+
+        .desktop-only { display: none !important; }
+        .mobile-only { display: block !important; }
+
+        /* Pathway Selector */
+        .pathway-selector {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            gap: 5px; /* Gap between buttons */
+        }
+        .pathway-select-btn {
+            flex-grow: 1;
+            padding: 10px 5px;
+            font-size: 0.85em;
+            background-color: #383838;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            text-align: center;
+        }
+        .pathway-select-btn.active {
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            border-color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* Pathways display for mobile */
+        .pathways-container {
+            display: block; /* Overrides display:none default for desktop */
+            border-top: none; /* Managed by pathway selector */
+            padding-top: 0;
+            margin-top: 0;
+        }
+        .pathways-flex { /* On mobile, this is not a flex container for the pathways themselves */
+            display: block; 
+        }
+        .pathway-content-area {
+            display: none; /* Hide all pathway content areas by default */
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px; /* Space between selected pathway and next panel */
+            background-color: var(--panel-bg);
+        }
+        .pathway-content-area.active-pathway-area {
+            display: block; /* Show only the active one */
+        }
+        .pathway { /* Individual pathway styling for mobile when shown */
+            border: none; /* Border is on pathway-content-area */
+            padding: 0;
+            box-shadow: none;
+            margin:0; /* Reset desktop margins */
+        }
+        .pathway h2.pathway-title { /* Desktop titles, hidden on mobile via .desktop-only */
+            display: none; 
+        }
+        .sub-pathway { width: 100%; padding: 8px; margin-top: 8px;}
+
+        /* Mobile Panels Layout: Vertical Stack */
+        .mobile-panels-flex-wrapper { /* Was flex row, now default block stacking */
+            display: block; 
+        }
+        .mobile-panel-item { /* No longer needs flex-basis for row layout */
+            /* flex: 1; Remove */
+            /* min-width: 0; Remove */
+            margin-bottom: 10px; /* Space between vertically stacked panels */
+        }
+        .aa-modulators-panel.mobile-panel-item,
+        .other-drugs-panel.mobile-panel-item,
+        .readout-panel-main.mobile-panel-item {
+            flex-basis: auto; /* Reset from previous row layout */
+        }
+
+        /* Ensure panel titles and content behave well within flex items */
+        .mobile-panel-item .panel-toggle {
+            font-size: 0.9em; /* Slightly smaller titles for side-by-side */
+            padding: 8px 10px;
+        }
+        .mobile-panel-item .panel-content {
+            padding: 10px; /* Adjust padding for content within side-by-side panels */
+        }
+
+        /* Panel Accordions (Controls, Readouts) */
+        .panel { margin-top: 10px; padding: 0; border:none; box-shadow: none; background: none;}
+        .panel h2.panel-toggle {
+            background-color: var(--panel-bg); /* Darker than sub-pathway */
+            color: var(--secondary-color);
+            padding: 10px 12px;
+            font-size: 1.05em;
+            margin-bottom: 0; /* No margin when closed, content follows directly */
+            cursor: default; /* No longer a toggle */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            border-radius: 6px; /* Keep rounded corners for the title */
+            /* transition: border-radius 0.2s ease; No longer needed */
+        }
+        .panel h2.panel-toggle.active { /* No active state needed for title if not collapsing */
+            border-bottom-left-radius: 6px; /* Keep consistent radius */
+            border-bottom-right-radius: 6px;
+            border-bottom-color: var(--border-color); /* Solid border */
+        }
+        .panel h2.panel-toggle::after { /* Remove arrow icon */
+            display: none;
+        }
+        /* .panel h2.panel-toggle.active::after { (No longer needed)
+            transform: rotate(180deg); 
+        } */
+        .panel .panel-content {
+            display: block; /* Always show panel content on mobile */
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-top: none; /* Title provides top border */
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            background-color: var(--panel-bg);
+            margin-top: -1px; /* Overlap with bottom border of H2 for seamless look */
+        }
+        .aa-modulators-panel .panel-content,
+        .other-drugs-panel .panel-content {
+            display: flex; /* Enable flex for button layout */
+            flex-wrap: wrap; /* Allow buttons to wrap to the next line */
+            justify-content: flex-start; /* Align items to the start, good for grid-like rows */
+            gap: 6px; /* Consistent gap between buttons */
+        }
+
+        .aa-modulators-panel .panel-content button,
+        .other-drugs-panel .panel-content button {
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            /* Make buttons take up equal space aiming for 3 per line */
+            flex-grow: 0; /* Do not allow to grow */
+            flex-shrink: 0; /* Do not allow to shrink */
+            flex-basis: calc((100% - 12px) / 3); /* 3 items per line, 2 gaps of 6px each */
+            /* max-width: calc(100% / 3 - 6px); Removed, as grow is 0 */
+
+            margin: 0; 
+            padding: 8px 4px; 
+            font-size: 0.75em; 
+            line-height: 1.2;
+            white-space: normal; 
+            text-align: center;
+            min-height: 40px; 
+            box-sizing: border-box; 
+            border: 1px solid var(--border-color);
+            border-radius: 4px; 
+            background-color: #3a3a3a;
+            color: var(--text-color);
+            transition: background-color 0.2s ease, border-color 0.2s ease; 
+        }
+        /* Hover state from general button style */
+        .aa-modulators-panel .panel-content button:hover,
+        .other-drugs-panel .panel-content button:hover {
+            background-color: #4f4f4f;
+            border-color: #666; 
+            transform: translateY(-1px);
+        }
+        #reset-btn { /* Ensure reset button special style is maintained */
+            background-color: #c0392b;
+            color: white;
+            border-color: #c0392b;
+        }
+        #reset-btn:hover {
+            background-color: #a93226;
+            border-color: #a93226;
+        }
+
+        .control-panel button { /* General class, ensure these are full width on mobile if used */
+            display: block; width: 100%; margin: 8px auto; font-size: 0.9em; padding: 10px 12px; 
+        }
+
+        .node { padding: 7px 10px; font-size: 0.8em; }
+        #pla2 { font-size: 0.7em; padding: 2px 5px; }
+        #main-tooltip { font-size: 0.8em; max-width: calc(100vw - 30px); }
+        .readout-grid { 
+            grid-template-columns: repeat(3, 1fr); /* Three items per row */
+            gap: 5px; /* Adjust gap for 3 columns */
+        }
+        .readout-item { 
+            padding: 5px; /* Further adjust padding for 3 columns */ 
+            min-height: 60px; /* Ensure a minimum height for tapability and visual consistency */
+            display: flex; /* Use flex to manage internal alignment */
+            flex-direction: column;
+            justify-content: space-between; /* Distribute space for label, bar, status */
+        }
+        .readout-label { 
+            font-size: 0.7em; /* Smaller font for 3 columns */
+            margin-bottom: 2px; 
+            align-items: center; 
+            line-height: 1.1; /* Allow wrapping if needed */
+            text-align: center; /* Center label text */
+            flex-shrink: 0; /* Prevent shrinking if text is long */
+        }
+        .readout-status { 
+            font-size: 0.65em; /* Smaller font for 3 columns */
+            text-align: center; /* Center status text */
+            margin-top: 2px; /* Space above status */
+            flex-shrink: 0;
+        }
+        .readout-bar-container { 
+            height: 7px; /* Maintain small bar height */
+            margin-bottom: 2px; 
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .mobile .tooltip-term::after { max-width: 180px; }
+
+        /* Hide original pathway lines for mobile */
+        .pathways-container::before, .pathways-container::after, .pathways-container > .pathways-flex::after { display: none; }
+
+        /* Pathway content optimization for mobile - MULTI-COLUMN FOCUS */
+        .pathway-content {
+            column-count: 2;
+            column-gap: 10px;
+        }
+
+        .pathway-content > .node,
+        .pathway-content > .connector, /* Re-add connector here */
+        .pathway-content > .mediator-group,
+        .pathway-content > .sub-pathway {
+            break-inside: avoid-column;
+            /* Ensure these elements take up full width of a column if they are block-like */
+            /* display: inline-block; /* or block, depending on desired flow */
+            /* width: 100%; */
+        }
+
+        .pathway-content > .connector { /* New approach for connector */
+            break-before: column; /* Attempt to force a column break before this element */
+            text-align: center;   /* Center the text content */
+            margin-top: 10px;     /* Add some visual spacing */
+            margin-bottom: 10px;  /* Add some visual spacing */
+            /* break-inside: avoid-column; is already applied from the group above */
+        }
+
+        .synthase-mediator-pair {
+            flex-direction: row; /* Ensure horizontal layout */
+            align-items: center; 
+            gap: 4px; /* Reduced gap for horizontal */
+            margin-bottom: 5px; 
+        }
+        .synthase-mediator-pair .node { 
+            max-width: none; /* Allow natural width or controlled by flex */
+            flex-shrink: 1; /* Allow nodes to shrink if needed */
+            padding: 4px 6px; /* Smaller padding */
+            font-size: 0.75em; /* Smaller font */
+            text-align: center; 
+        }
+        .synthase-mediator-pair .connector-arrow {
+            transform: rotate(0deg); /* Ensure arrow points right */
+            font-size: 0.9em;    
+            margin: 0 2px;      
+        }
+
+        .connector { 
+            font-size: 0.7em; 
+            margin: 3px 0;
+            padding: 3px 0;
+        }
+        .connector::before { 
+            height: 12px; 
+        }
+        
+        .sub-pathway {
+            padding: 6px;
+            margin-top: 6px;
+        }
+        .sub-pathway h3 {
+            font-size: 0.85em; /* Slightly smaller sub-pathway titles */
+            margin-bottom: 4px;
+            padding-bottom: 2px;
+        }
+
+        .node { /* General node adjustments for pathways */
+            padding: 5px 8px; /* Original was 7px 10px, then 6px 9px */
+            font-size: 0.78em; 
+        }
+        #pla2 { 
+            font-size: 0.68em; 
+            padding: 2px 4px; 
+        }
+        
+        .mediator-group {
+            gap: 3px; /* Tighter gap for horizontally arranged pairs */
+            margin-top: 6px; 
+            /* break-inside: avoid-column; /* Already covered by .pathway-content > .mediator-group */
+        }
+    }
+
+    @media (max-width: 480px) {
+        .main-container { padding: 5px; /* Reduce padding for very small screens */}
+        h1 { font-size: 1.25em; } 
+        h2.panel-toggle { font-size: 1em; padding: 8px 10px; }
+        .pathway-select-btn { font-size: 0.8em; padding: 8px 4px;}
+
+        .panel .panel-content button {
+            padding: 9px;
+            font-size: 0.85em;
+        }
+        .node { padding: 6px 8px; }
+        #trigger-btn { font-size: 0.85em; padding: 8px 15px; }
+        #main-tooltip { width: calc(100vw - 20px); }
+        .readout-item { padding: 4px; min-height: 55px; } /* Adjust for very small screens too */
+        .readout-label { font-size: 0.65em;}
+        .readout-status {font-size: 0.6em;}
+        .readout-bar-container { height: 6px; }
+
+        /* Further pathway content optimization for very small screens - MULTI-COLUMN FOCUS */
+        /* .pathway-content ruleset was here and empty, removing it. */
+ 
+        /* Grouped selectors .pathway-content > .node, etc. ruleset was here and empty, removing it. */
+
+        /* Specific .pathway-content > .connector ruleset was here and empty, removing it. */
+
+        /* Retain horizontal compactness for items within columns */
+        .synthase-mediator-pair {
+            gap: 2px;
+            margin-bottom: 4px;
+        }
+        .synthase-mediator-pair .node {
+            padding: 3px 5px;
+            font-size: 0.7em;
+        }
+        .synthase-mediator-pair .connector-arrow {
+            font-size: 0.8em;
+            margin: 0 1px;
+        }
+
+        .connector {
+            font-size: 0.65em;
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+        .connector::before {
+            height: 10px;
+        }
+
+        .sub-pathway {
+            padding: 5px;
+            margin-top: 5px;
+        }
+        .sub-pathway h3 {
+            font-size: 0.8em;
+            margin-bottom: 3px;
+            padding-bottom: 1px;
+        }
+
+        .node { /* General nodes on very small screens */
+            padding: 4px 6px; 
+            font-size: 0.72em; 
+        }
+        #pla2 {
+            font-size: 0.62em;
+            padding: 2px 3px;
+        }
+
+        .mediator-group {
+            gap: 2px;
+            margin-top: 5px;
+            /* break-inside: avoid-column; /* Already covered by .pathway-content > .mediator-group */
+        }
+    }
+}
+
+
+/* --- SPECIAL PC SINGLE-SCREEN LAYOUT (e.g., 1920x1080 landscape) --- */
+@media (min-width: 1300px) and (min-height: 700px) {
+    body {
+        font-size: var(--pc-base-font-size);
+        padding: 10px;
+        overflow: hidden; /* Prevent body scroll for PC app-like layout */
+    }
+    .main-container { /* PC Layout: side-by-side columns */
+        max-width: 98vw;
+        height: calc(98vh - 20px); /* Adjusted for body padding */
+        margin: 10px auto;
+        padding: 15px;
+        flex-direction: row; /* Side-by-side columns */
+        gap: 15px;
+        overflow: hidden;
+        border-radius: 12px; /* Restore for PC */
+        box-shadow: 0 8px 25px var(--shadow-color); /* Restore for PC */
+    }
+
+    .diagram-column { /* Left column */
+        flex: 3;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        border-right: 1px solid var(--border-color);
+        padding-right: 15px;
+        width: auto; /* Reset mobile width */
+    }
+    .panels-column { /* Right column */
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        padding-left: 15px; 
+        width: auto; /* Reset mobile width */
+    }
+    .cascade-diagram-area {
+        margin-bottom: 0;
+        flex-grow: 1;
+        overflow: hidden; 
+    }
+    .panels-container { margin-top: 0; }
+
+    /* Ensure mobile-only pathway selector is hidden on PC */
+    .mobile-only { display: none !important; }
+    .desktop-only { display: block !important; }
+    .pathway-content-area { /* On desktop, these are directly the pathways */
+        display: flex !important; /* Override JS hiding if it was last on mobile view */
+        flex-direction: column;
+        align-items: center;
+        /* Desktop pathway direct styling */
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 15px;
+        margin: 0; /* Desktop handled by flex gap */
+        flex: 1 1 30%; 
+        min-width: 260px;
+        background-color: var(--panel-bg); 
+        box-shadow: 0 4px 12px var(--shadow-color);
+    }
+    .pathway.cox-pathway { border-top: 4px solid var(--accent-color); }
+    .pathway.lox-pathway { border-top: 4px solid var(--lox-color); }
+    .pathway.cyp-pathway { border-top: 4px solid var(--cyp-color); }
+    
+    .pathways-container { /* For PC, it's the main flex container again */
+        display: flex !important; /* Ensure it's flex for desktop */
+        padding-top: 10px; margin-top: 5px;
+        flex-grow: 1; 
+        overflow-y: auto; 
+        min-height: 200px;
+        border-top: 1px solid var(--border-color); /* Restore this for desktop */
+    }
+    .pathways-flex { /* This is the direct child for PC flex layout of pathways */
+        display: flex;
+        justify-content: space-around;
+        align-items: stretch; 
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 10px; 
+        height: 100%; 
+    }
+     /* Restore original pathway connector lines for PC */
+    .pathways-container::before { display: block; left: calc(16.66% + 5px); height:10px;} /* Adjusted from original for new flex basis */
+    .pathways-container::after { display: block; left: 50%; height:10px;}
+    .pathways-container > .pathways-flex::after { display: block; left: calc(83.33% - 5px); height:10px; }
+
+    /* PC panel accordion (H2 remains, content is always visible) */
+    .panel h2.panel-toggle { background-color: transparent; padding: 0; margin-bottom: 15px; border: none; border-bottom: 1px solid var(--border-color); border-radius: 0; cursor: default; }
+    .panel h2.panel-toggle::after { display: none; } /* No arrow on PC */
+    .panel .panel-content { display: block !important; padding:0; border:none; border-radius: 0; background:none; }
+
+
+    h1 { font-size: 1.5em; margin-bottom: 10px; }
+    .membrane { padding: 8px 15px; margin-bottom: 10px; min-width: 150px; font-size: 0.9em; }
+    #trigger-btn { padding: 8px 15px; font-size: 0.85em; margin-bottom:10px;}
+    #aa-pool { padding: 8px 15px; font-size: 0.9em; margin-top: 5px; }
+    .arrow-down { height: 15px; margin: 4px auto; }
+    .arrow-down::after { width: 7px; height: 7px; }
+
+    .pathway { /* Re-apply specific pathway styles for PC if overridden by pathway-content-area */
+        padding: 10px;
+        min-width: 220px;
+        max-height: 100%; 
+        overflow-y: auto; 
+    }
+    .pathway h2.pathway-title { /* Show desktop pathway titles */
+        display: block;
+        font-size: 1em; margin-bottom: 8px; 
+        color: var(--secondary-color); /* Default, overridden by specific pathway color below */
+    }
+    .cox-pathway h2.pathway-title { color: var(--accent-color); }
+    .lox-pathway h2.pathway-title { color: var(--lox-color); }
+    .cyp-pathway h2.pathway-title { color: var(--cyp-color); }
+
+    .sub-pathway { padding: 8px; margin-top: 8px; }
+    .sub-pathway h3 { font-size: 0.9em; margin-bottom: 6px; padding-bottom: 3px; }
+
+    .node { padding: 5px 8px; margin: 4px auto; font-size: 0.8em; }
+    .mediator, .lipoxin { padding: 5px 10px; border-radius: 12px; }
+    #pla2 { font-size: 0.7em; padding: 2px 4px; }
+    .connector { margin: 4px 0; padding: 5px 0; font-size: 0.75em; }
+    .connector::before { height: 15px; }
+
+    /* PC Panels are not accordions, content always visible */
+    .panel { 
+        padding: 10px; margin-top: 0; /* margin-top is handled by gap in .panels-container */
+        background-color: var(--panel-bg); /* Restore background */
+        border: 1px solid var(--border-color); /* Restore border */
+        border-radius: 8px; /* Restore radius */
+        box-shadow: 0 3px 10px var(--shadow-color); /* Restore shadow */
+    }
+    .panel h2 { /* General H2 for panels on PC */
+         font-size: 1.1em; padding-bottom: 5px; margin-bottom: 8px; 
+         border-bottom: 1px solid var(--border-color); /* Ensure this is applied */
+    }
+
+    .control-panel button, /* For original .control-panel buttons if any are still separate */
+    .aa-modulators-panel .panel-content button,
+    .other-drugs-panel .panel-content button {
+        display: inline-block; /* Allow wrapping */
+        width: auto; /* Auto width for content */
+        padding: 6px 10px; font-size: 0.8em; margin: 2px;
+        flex-grow: 1;
+        min-width: 120px;
+    }
+    .aa-modulators-panel .panel-content, .other-drugs-panel .panel-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        justify-content: center;
+    }
+
+    .readout-panel-main { /* PC specific for readout area */
+        flex-grow: 1;
+        overflow-y: auto; 
+        min-height: 150px;
+    }
+    .readout-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 8px; margin-top: 8px;
+    }
+    .readout-item { padding: 8px; }
+    .readout-label { font-size: 0.85em; margin-bottom: 4px; }
+    .readout-bar-container { height: 12px; margin-bottom: 4px; border-radius: 5px; }
+    .readout-bar { border-radius: 5px; }
+    .readout-status { font-size: 0.8em; }
+
+    #main-tooltip { font-size: 0.8em; padding: 8px 10px; max-width: 280px; }
+    #main-tooltip h3 { font-size: 0.95em; }
+    .tooltip-term::after { font-size: 0.75em; padding: 3px 6px; max-width: 200px; }
+
+}

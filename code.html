@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Dive Interactive Arachidonic Acid Cascade - Dark Mode</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Main Tooltip Container (Used by JS) -->
+    <div id="main-tooltip"></div>
+
+    <div class="main-container">
+        <div class="diagram-column"> <!-- This column might be mainly for desktop structure now -->
+            <div class="cascade-diagram-area">
+                <h1>Deep Dive: Arachidonic Acid Cascade</h1>
+                <!-- Membrane & Trigger -->
+                <div class="membrane">
+                     <span class="membrane-text">Membrane <span class="tooltip-term" data-term-info="Lipid molecules with a phosphate group, forming cell membranes">Phospholipids</span> (<span class="tooltip-term" data-term-info="The second carbon atom of the glycerol backbone in a glycerophospholipid">sn-2</span> position)</span>
+                     <div class="enzyme node" id="pla2" data-name="Phospholipase A₂ (PLA₂)" data-info="Family of <span class='tooltip-term' data-term-info='Proteins that catalyze biochemical reactions'>enzymes</span> that <span class='tooltip-term' data-term-info='Break ester bonds using water'>hydrolyze</span> <span class='tooltip-term' data-term-info='Organic acids with a long aliphatic chain'>fatty acids</span> from the sn-2 position of phospholipids. Crucial first step, releasing <span class='tooltip-term' data-term-info='Arachidonic Acid'>AA</span>. Activity increased by inflammatory signals (<span class='tooltip-term' data-term-info='Signaling proteins like TNF-α, IL-1, involved in inflammation'>cytokines</span>, <span class='tooltip-term' data-term-info='Influx of calcium ions into the cell, often a trigger for cellular processes'>Ca²⁺ influx</span>, <span class='tooltip-term' data-term-info='Activation of cell surface proteins that bind signaling molecules'>receptor activation</span>). Indirectly inhibited by <span class='tooltip-term' data-term-info='Anti-inflammatory steroid drugs like prednisone, which suppress gene expression of inflammatory proteins'>corticosteroids</span> (via <span class='tooltip-term' data-term-info='Proteins (e.g., Lipocortin-1) whose synthesis is induced by corticosteroids and which inhibit PLA₂ activity'>Annexin-1/Lipocortin-1</span>).">
+                        <span class="enzyme-text">PLA₂</span>
+                     </div>
+                 </div>
+                 <button id="trigger-btn">Apply Stimulus (Activate PLA₂)</button>
+                 <div class="arrow-down" id="arrow-to-aa"></div>
+                 <div class="aa-pool node" id="aa-pool" data-name="Arachidonic Acid (AA)" data-info="Free (<span class='tooltip-term' data-term-info='Not attached to another molecule via an ester bond'>non-esterified</span>) 20:4(ω-6) <span class='tooltip-term' data-term-info='A polyunsaturated omega-6 fatty acid with 20 carbons and 4 double bonds'>fatty acid</span>. The central <span class='tooltip-term' data-term-info='The molecule an enzyme acts upon'>substrate</span> for synthesis of <span class='tooltip-term' data-term-info='Potent, short-lived lipid signaling molecules derived from 20-carbon fatty acids (like AA), e.g., prostaglandins, leukotrienes'>eicosanoids</span> via <span class='tooltip-term' data-term-info='Cyclooxygenase pathway'>COX</span>, <span class='tooltip-term' data-term-info='Lipoxygenase pathway'>LOX</span>, and <span class='tooltip-term' data-term-info='Cytochrome P450 pathway'>CYP</span> pathways. Availability is <span class='tooltip-term' data-term-info='The slowest step in a metabolic pathway, determining the overall rate'>rate-limiting</span>.">
+                      <span class="aa-text">Arachidonic Acid (AA)</span>
+                 </div>
+                 <div class="arrow-down" id="arrow-to-pathways"></div>
+
+                 <!-- Pathway Selection Buttons (Mobile) -->
+                 <div class="pathway-selector mobile-only">
+                     <button class="pathway-select-btn active" data-pathway="cox">COX Pathway</button>
+                     <button class="pathway-select-btn" data-pathway="lox">LOX Pathway</button>
+                     <button class="pathway-select-btn" data-pathway="cyp">CYP450 Pathway</button>
+                 </div>
+
+                 <!-- Pathways Container - for desktop it's flex, for mobile it contains the selected pathway -->
+                 <div class="pathways-container">
+                   <div class="pathways-flex"> <!-- This flex wrapper is mainly for desktop layout -->
+                     <!-- COX Pathway -->
+                     <div class="pathway cox-pathway pathway-content-area active-pathway-area" data-pathway-id="cox">
+                         <h2 class="pathway-title desktop-only">COX Pathway (<span class='tooltip-term' data-term-info='Subclass of eicosanoids including prostaglandins, prostacyclin, thromboxane, produced by COX enzymes'>Prostanoids</span>)</h2>
+                         <div class="pathway-content"> <!-- This div was used by previous accordion, content remains -->
+                             <div class="enzyme node" id="cox1" data-name="COX-1" data-info="<span class='tooltip-term' data-term-info='Always present in cells, performing baseline physiological functions'>Constitutively</span> expressed <span class='tooltip-term' data-term-info='Enzyme that adds oxygen in a cyclic manner; converts AA to PGG₂'>cyclooxygenase</span>. <span class='tooltip-term' data-term-info='Having two distinct catalytic activities'>Bifunctional enzyme</span> (cyclooxygenase & <span class='tooltip-term' data-term-info='Enzyme that reduces peroxides; converts PGG₂ to PGH₂'>peroxidase</span>). Converts <span class='tooltip-term' data-term-info='Arachidonic Acid'>AA</span> → <span class='tooltip-term' data-term-info='Prostaglandin G₂, an unstable intermediate with a peroxide group'>PGG₂</span> → <span class='tooltip-term' data-term-info='Prostaglandin H₂, a key intermediate for all prostanoids'>PGH₂</span>. Generates prostanoids for <span class='tooltip-term' data-term-info='Maintaining stable internal physiological conditions'>physiological homeostasis</span> (stomach, <span class='tooltip-term' data-term-info='Small blood cells involved in clotting'>platelets</span>, kidney). Target of <span class='tooltip-term' data-term-info='Non-Steroidal Anti-Inflammatory Drugs like ibuprofen'>NSAIDs</span>. <span class='tooltip-term' data-term-info='A specific NSAID that irreversibly inhibits COX enzymes'>Aspirin</span> <span class='tooltip-term' data-term-info='Adds an acetyl group to a molecule'>acetylates</span> <span class='tooltip-term' data-term-info='A specific serine amino acid residue (at position 530) in the COX enzyme active site'>Ser530</span>, <span class='tooltip-term' data-term-info='Permanent blockade of the enzyme activity'>irreversibly inhibiting</span> it.">
+                                 <span class="enzyme-text">COX-1</span>
+                             </div>
+                             <div class="enzyme node" id="cox2" data-name="COX-2" data-info="<span class='tooltip-term' data-term-info='Its expression level increases significantly in response to stimuli like inflammation or growth factors'>Inducible</span> <span class='tooltip-term' data-term-info='A variant form of an enzyme, often with different regulation or tissue distribution'>isoform</span> (also constitutive in some tissues). Same function as COX-1. <span class='tooltip-term' data-term-info='Increased in quantity or activity'>Upregulated</span> by inflammatory stimuli/<span class='tooltip-term' data-term-info='Substances that stimulate cell division (mitosis)'>mitogens</span>. Major source of <span class='tooltip-term' data-term-info='Mediators that promote inflammation'>pro-inflammatory</span> prostanoids. Target of NSAIDs & selective <span class='tooltip-term' data-term-info='COX-2 specific inhibitors (e.g., celecoxib) designed to reduce gastrointestinal side effects of non-selective NSAIDs'>Coxibs</span>.">
+                                 <span class="enzyme-text">COX-2</span>
+                             </div>
+                             <div class="intermediate node" id="pgh2" data-name="Prostaglandin H₂ (PGH₂)" data-info="Unstable <span class='tooltip-term' data-term-info='Molecule with an O-O (peroxide) bridge within a ring structure, characteristic of PGG₂ and PGH₂'>endoperoxide</span> <span class='tooltip-term' data-term-info='A molecule formed during a multi-step reaction pathway'>intermediate</span> produced by COX enzymes. <span class='tooltip-term' data-term-info='The molecule an enzyme acts upon'>Substrate</span> for downstream <span class='tooltip-term' data-term-info='Enzymes that catalyze the rearrangement of a molecule into one of its isomers'>isomerases</span> and <span class='tooltip-term' data-term-info='Enzymes that catalyze the synthesis of a specific product from a precursor'>synthases</span>.">
+                                 <span class="intermediate-text">PGH₂</span>
+                             </div>
+                             <div class="connector">↓ Specific Synthases ↓</div>
+                             <div class="mediator-group">
+                                 <div class="synthase-mediator-pair">
+                                     <div class="synthase node" id="pges" data-name="PGE Synthases (PGES)" data-info="<span class='tooltip-term' data-term-info='Enzymes that rearrange PGH₂ to form PGE₂'>Isomerize PGH₂ to PGE₂</span>. <span class='tooltip-term' data-term-info='Microsomal Prostaglandin E Synthase-1, often co-expressed with COX-2 during inflammation'>mPGES-1</span> often coupled with COX-2 in <span class='tooltip-term' data-term-info='The body\'s response to injury or infection, characterized by redness, swelling, heat, and pain'>inflammation</span>. <span class='tooltip-term' data-term-info='Prostaglandin E₂'>PGE₂</span> has broad pro-inflammatory, <span class='tooltip-term' data-term-info='Fever-inducing'>pyretic</span>, <span class='tooltip-term' data-term-info='Pain-sensitizing or pain-inducing'>hyperalgesic</span> effects.">PGES</div>
+                                     <span class="connector-arrow">→</span>
+                                     <div class="mediator node" id="pge2" data-name="Prostaglandin E₂ (PGE₂)" data-info="Key inflammatory <span class='tooltip-term' data-term-info='A substance that transmits a signal within or between cells'>mediator</span>: <span class='tooltip-term' data-term-info='Widening of blood vessels, leading to increased blood flow'>Vasodilation</span>, ↑<span class='tooltip-term' data-term-info='The ease with which substances can pass through blood vessel walls'>permeability</span>, <span class='tooltip-term' data-term-info='Increased sensitivity to painful stimuli'>pain sensitization</span>, <span class='tooltip-term' data-term-info='Elevation of body temperature'>fever</span>. <span class='tooltip-term' data-term-info='Protecting cells or tissues from damage'>Cytoprotective</span> in stomach. Modulates kidney function. Affects <span class='tooltip-term' data-term-info='The degree of muscle contraction in the uterus'>uterine tone</span>. Binds <span class='tooltip-term' data-term-info='Specific G protein-coupled receptors (EP1, EP2, EP3, EP4) that mediate the effects of PGE₂'>EP1-4 receptors</span>.">PGE₂</div>
+                                 </div>
+                                 <div class="synthase-mediator-pair">
+                                      <div class="synthase node" id="pgds" data-name="PGD Synthases (PGDS)" data-info="<span class='tooltip-term' data-term-info='Enzymes that rearrange PGH₂ to form PGD₂'>Isomerize PGH₂ to PGD₂</span>. Found in <span class='tooltip-term' data-term-info='Central Nervous System (brain and spinal cord)'>CNS</span>, <span class='tooltip-term' data-term-info='Immune cells involved in allergic and inflammatory responses, releasing histamine and other mediators'>mast cells</span>. <span class='tooltip-term' data-term-info='Prostaglandin D₂'>PGD₂</span> involved in sleep, <span class='tooltip-term' data-term-info='Immune responses to allergens, such as hay fever or asthma'>allergic responses</span>, <span class='tooltip-term' data-term-info='The active process of shutting down inflammation and restoring tissue function'>resolution</span> (via <span class='tooltip-term' data-term-info='15-deoxy-Δ12,14-Prostaglandin J₂, an anti-inflammatory metabolite of PGD₂'>15d-PGJ₂</span>).">PGDS</div>
+                                      <span class="connector-arrow">→</span>
+                                      <div class="mediator node" id="pgd2" data-name="Prostaglandin D₂ (PGD₂)" data-info="Major mast cell product. <span class='tooltip-term' data-term-info='Narrowing of the airways (bronchi and bronchioles) in the lungs'>Bronchoconstriction</span>, <span class='tooltip-term' data-term-info='Widening of blood vessels'>vasodilation</span>, inhibits <span class='tooltip-term' data-term-info='Clumping of blood platelets, a key step in blood clot formation'>platelet aggregation</span>, promotes sleep. Can yield anti-inflammatory <span class='tooltip-term' data-term-info='Prostaglandin J₂ series, derived from PGD₂, often anti-inflammatory'>PGJ₂</span>. Binds <span class='tooltip-term' data-term-info='Specific receptors for PGD₂ (DP1 and DP2, also known as CRTH2)'>DP1/DP2(CRTH2) receptors</span>.">PGD₂</div>
+                                 </div>
+                                  <div class="synthase-mediator-pair">
+                                      <div class="synthase node" id="pgis" data-name="Prostacyclin Synthase (PGIS)" data-info="Converts <span class='tooltip-term' data-term-info='Prostaglandin H₂'>PGH₂</span> to <span class='tooltip-term' data-term-info='Prostaglandin I₂, also known as PGI₂'>Prostacyclin (PGI₂)</span>. Primarily in <span class='tooltip-term' data-term-info='Cells lining the interior surface of blood vessels and lymphatic vessels'>endothelial cells</span>, often coupled with <span class='tooltip-term' data-term-info='Cyclooxygenase-2, an enzyme often induced during inflammation'>COX-2</span>.">PGIS</div>
+                                      <span class="connector-arrow">→</span>
+                                      <div class="mediator node" id="pgi2" data-name="Prostacyclin (PGI₂)" data-info="Potent <span class='tooltip-term' data-term-info='Agent that widens blood vessels'>vasodilator</span> and inhibitor of <span class='tooltip-term' data-term-info='Clumping of blood platelets'>platelet aggregation</span>. <span class='tooltip-term' data-term-info='Protecting cells from damage'>Cytoprotective</span>. Opposes <span class='tooltip-term' data-term-info='Thromboxane A₂, a potent vasoconstrictor and platelet aggregator'>TXA₂</span> actions. Important for <span class='tooltip-term' data-term-info='Maintenance of blood vessel health and normal blood flow'>vascular homeostasis</span>. Binds <span class='tooltip-term' data-term-info='Specific receptors for PGI₂ (Prostacyclin receptor)'>IP receptors</span>.">PGI₂</div>
+                                  </div>
+                                  <div class="synthase-mediator-pair">
+                                       <div class="synthase node" id="txas" data-name="Thromboxane Synthase (TXAS)" data-info="Converts <span class='tooltip-term' data-term-info='Prostaglandin H₂'>PGH₂</span> to <span class='tooltip-term' data-term-info='A potent vasoconstrictor and platelet aggregator'>Thromboxane A₂ (TXA₂)</span>. Primarily in <span class='tooltip-term' data-term-info='Small, irregular-shaped cell fragments in blood, crucial for clotting'>platelets</span>, coupled with <span class='tooltip-term' data-term-info='Cyclooxygenase-1, a constitutively expressed enzyme'>COX-1</span>.">TXAS</div>
+                                       <span class="connector-arrow">→</span>
+                                       <div class="mediator node" id="txa2" data-name="Thromboxane A₂ (TXA₂)" data-info="Potent <span class='tooltip-term' data-term-info='Agent that narrows blood vessels'>vasoconstrictor</span> and <span class='tooltip-term' data-term-info='Substance that causes platelets to clump together'>platelet aggregator</span>. Promotes <span class='tooltip-term' data-term-info='Formation of a blood clot within a blood vessel'>clot formation</span>. Primarily from platelets (COX-1). Binds <span class='tooltip-term' data-term-info='Specific receptors for Thromboxane A₂ (Thromboxane receptor)'>TP receptors</span>. <span class='tooltip-term' data-term-info='A common NSAID that irreversibly inhibits COX enzymes, thereby reducing TXA₂ synthesis'>Aspirin</span> blocks this effectively.">TXA₂</div>
+                                   </div>
+                             </div>
+                         </div>
+                     </div>
+
+                     <!-- LOX Pathway -->
+                     <div class="pathway lox-pathway pathway-content-area" data-pathway-id="lox">
+                         <h2 class="pathway-title desktop-only">LOX Pathway (<span class='tooltip-term' data-term-info='Eicosanoids like LTB₄ and Cysteinyl Leukotrienes (LTC₄, LTD₄, LTE₄), produced by LOX enzymes'>Leukotrienes</span>, <span class='tooltip-term' data-term-info='Anti-inflammatory eicosanoids promoting the resolution of inflammation, e.g., LXA₄, LXB₄'>Lipoxins</span>)</h2>
+                         <div class="pathway-content">
+                             <div class="sub-pathway">
+                                <h3>5-LOX Branch (Leukotrienes)</h3>
+                                 <div class="accessory-protein node" id="flap" data-name="FLAP (5-LOX Activating Protein)" data-info="<span class='tooltip-term' data-term-info='Protein that spans a cellular membrane'>Integral membrane protein</span>. Essential for cellular <span class='tooltip-term' data-term-info='5-Lipoxygenase, the key enzyme in leukotriene synthesis'>5-LOX</span> activity by presenting <span class='tooltip-term' data-term-info='Arachidonic Acid'>AA</span> to the enzyme. Target for some <span class='tooltip-term' data-term-info='Drugs used to treat asthma by inhibiting leukotriene production or action'>anti-asthma drugs</span>.">
+                                    <span class="accessory-text">FLAP</span>
+                                </div>
+                                 <div class="enzyme node" id="lox5" data-name="5-Lipoxygenase (5-LOX)" data-info="Key enzyme for <span class='tooltip-term' data-term-info='Leukotriene, a class of inflammatory mediators'>LT</span> synthesis. Converts AA → <span class='tooltip-term' data-term-info='5-Hydroperoxyeicosatetraenoic acid, an intermediate in leukotriene synthesis'>5-HPETE</span> → <span class='tooltip-term' data-term-info='Leukotriene A₄, an unstable epoxide intermediate'>LTA₄</span>. Found in <span class='tooltip-term' data-term-info='Immune cells like neutrophils, macrophages, mast cells, eosinophils, which originate from myeloid stem cells in bone marrow'>myeloid cells</span>. Target of <span class='tooltip-term' data-term-info='A 5-LOX inhibitor drug used to treat asthma'>Zileuton</span>.">
+                                      <span class="enzyme-text">5-LOX</span>
+                                 </div>
+                                 <div class="intermediate node" id="lta4" data-name="Leukotriene A₄ (LTA₄)" data-info="Unstable <span class='tooltip-term' data-term-info='Molecule containing a three-membered ring with one oxygen atom and two carbon atoms, highly reactive'>epoxide</span> <span class='tooltip-term' data-term-info='A molecule formed during a multi-step reaction pathway'>intermediate</span>. <span class='tooltip-term' data-term-info='The molecule an enzyme acts upon'>Substrate</span> for <span class='tooltip-term' data-term-info='Enzyme that converts LTA₄ to LTB₄'>LTA₄ hydrolase</span> (→ <span class='tooltip-term' data-term-info='Leukotriene B₄, a potent chemoattractant'>LTB₄</span>) or <span class='tooltip-term' data-term-info='Enzyme that conjugates LTA₄ with glutathione to form LTC₄'>LTC₄ synthase</span> (→ <span class='tooltip-term' data-term-info='Leukotriene C₄, the first cysteinyl leukotriene'>LTC₄</span>).">
+                                      <span class="intermediate-text">LTA₄</span>
+                                 </div>
+                                 <div class="connector">↓ Specific Enzymes ↓</div>
+                                  <div class="mediator-group">
+                                     <div class="synthase-mediator-pair">
+                                         <div class="enzyme node" id="lta4h" data-name="LTA₄ Hydrolase (LTA4H)" data-info="<span class='tooltip-term' data-term-info='Enzyme found in the cytoplasm of cells'>Cytosolic enzyme</span>. Converts <span class='tooltip-term' data-term-info='Leukotriene A₄, an unstable epoxide intermediate'>LTA₄</span> to <span class='tooltip-term' data-term-info='Leukotriene B₄, a potent chemoattractant for neutrophils'>LTB₄</span>.">LTA4H</div>
+                                         <span class="connector-arrow">→</span>
+                                         <div class="mediator node" id="ltb4" data-name="Leukotriene B₄ (LTB₄)" data-info="Potent <span class='tooltip-term' data-term-info='Mediator that promotes inflammation'>pro-inflammatory mediator</span>. Strong <span class='tooltip-term' data-term-info='Chemical agent that attracts motile cells (like neutrophils) towards its source'>chemoattractant</span> for <span class='tooltip-term' data-term-info='A type of white blood cell (granulocyte), typically the first responders to bacterial infection or acute inflammation'>neutrophils</span>. Promotes <span class='tooltip-term' data-term-info='The sticking of cells to surfaces or other cells'>adhesion</span>, <span class='tooltip-term' data-term-info='Release of granules containing enzymes and antimicrobial substances from immune cells like neutrophils'>degranulation</span>. Binds <span class='tooltip-term' data-term-info='Specific G protein-coupled receptors (BLT1 and BLT2) for LTB₄'>BLT1/BLT2 receptors</span>.">LTB₄</div>
+                                     </div>
+                                     <div class="synthase-mediator-pair">
+                                          <div class="synthase node" id="ltc4s" data-name="LTC₄ Synthase (LTC4S)" data-info="<span class='tooltip-term' data-term-info='Protein embedded within a cellular membrane'>Integral membrane enzyme</span>. <span class='tooltip-term' data-term-info='Joins two molecules together'>Conjugates</span> <span class='tooltip-term' data-term-info='Leukotriene A₄'>LTA₄</span> with <span class='tooltip-term' data-term-info='An important antioxidant peptide (composed of glutamate, cysteine, and glycine) found in cells'>glutathione (GSH)</span> to form <span class='tooltip-term' data-term-info='Leukotriene C₄, the first cysteinyl leukotriene'>LTC₄</span>.">LTC4S</div>
+                                          <span class="connector-arrow">→</span>
+                                          <div class="mediator node" id="cyslt" data-name="Cysteinyl Leukotrienes (CysLTs: LTC₄→LTD₄→LTE₄)" data-info="<span class='tooltip-term' data-term-info='A group of leukotrienes (LTC₄, LTD₄, LTE₄) containing the amino acid cysteine; formerly known as Slow-Reacting Substance of Anaphylaxis (SRS-A)'>Cysteinyl Leukotrienes</span>. Potent <span class='tooltip-term' data-term-info='Substances that cause narrowing of the airways'>bronchoconstrictors</span>, increase <span class='tooltip-term' data-term-info='The property of blood vessel walls that allows fluids and cells to pass through'>vascular permeability</span>, <span class='tooltip-term' data-term-info='Production and release of mucus'>mucus secretion</span>. Key in <span class='tooltip-term' data-term-info='A chronic inflammatory disease of the airways characterized by reversible bronchoconstriction'>asthma</span>/<span class='tooltip-term' data-term-info='Exaggerated immune responses to common environmental substances (allergens)'>allergies</span>. Bind <span class='tooltip-term' data-term-info='Specific receptors (CysLT1 and CysLT2) for cysteinyl leukotrienes'>CysLT1/CysLT2 receptors</span>. <span class='tooltip-term' data-term-info='Leukotriene Receptor Antagonists (e.g., montelukast, zafirlukast) that block the CysLT1 receptor, used in asthma treatment'>LTRAs</span> block CysLT1.">CysLTs</div>
+                                     </div>
+                                  </div>
+                             </div>
+                              <div class="sub-pathway">
+                                 <h3>12/15-LOX Branch & Resolution</h3>
+                                 <div class="enzyme node" id="lox12" data-name="12-Lipoxygenase (12-LOX)" data-info="Converts <span class='tooltip-term' data-term-info='Arachidonic Acid'>AA</span> to <span class='tooltip-term' data-term-info='12-Hydroxyeicosatetraenoic acid, an eicosanoid with various biological activities'>12-HETE</span>. Involved in <span class='tooltip-term' data-term-info='Blood platelet function, including aggregation and release of mediators'>platelet function</span>, <span class='tooltip-term' data-term-info='The outermost layer of the skin that provides protection against environmental factors'>skin barrier</span>.">
+                                    <span class="enzyme-text">12-LOX</span>
+                                </div> → <div class="mediator node" id="hete12" data-name="12-HETE" data-info="<span class='tooltip-term' data-term-info='12-Hydroxyeicosatetraenoic acid'>12-HETE</span>. Modulates <span class='tooltip-term' data-term-info='Activation of platelets, leading to aggregation and clot formation'>platelet activation</span>, <span class='tooltip-term' data-term-info='Formation of new blood vessels from pre-existing ones'>angiogenesis</span>.">12-HETE</div>
+                                 <div class="enzyme node" id="lox15" data-name="15-Lipoxygenase (15-LOX)" data-info="Converts <span class='tooltip-term' data-term-info='Arachidonic Acid'>AA</span> to <span class='tooltip-term' data-term-info='15-Hydroxyeicosatetraenoic acid, a precursor for lipoxins and other mediators'>15-HETE</span>. Crucial for <span class='tooltip-term' data-term-info='A class of anti-inflammatory lipid mediators'>Lipoxin</span> synthesis via interactions with <span class='tooltip-term' data-term-info='5-Lipoxygenase'>5-LOX</span> in a <span class='tooltip-term' data-term-info='Process involving two or more different cell types to produce a final product'>transcellular</span> manner.">
+                                    <span class="enzyme-text">15-LOX</span>
+                                </div> → <div class="mediator node" id="hete15" data-name="15-HETE" data-info="<span class='tooltip-term' data-term-info='15-Hydroxyeicosatetraenoic acid'>15-HETE</span>. Precursor for <span class='tooltip-term' data-term-info='Anti-inflammatory lipid mediators that promote the resolution of inflammation'>Lipoxins</span>. Can have <span class='tooltip-term' data-term-info='Effects that reduce or counteract inflammation'>anti-inflammatory</span> effects itself.">15-HETE</div>
+                                 <div class="connector">↓ Transcellular Synthesis ↓</div>
+                                  <div class="lipoxin node" id="lipoxins" data-name="Lipoxins (LXA₄, LXB₄)" data-info="<span class='tooltip-term' data-term-info='A family of endogenous lipid mediators that actively orchestrate the shutdown of inflammation and promote tissue healing'>Specialized Pro-resolving Mediators (SPMs)</span>. Generated via sequential <span class='tooltip-term' data-term-info='Lipoxygenase enzymes, such as 5-LOX and 15-LOX'>LOX</span> actions, often involving multiple cell types (<span class='tooltip-term' data-term-info='Synthesis involving metabolic cooperation between different cells'>transcellular biosynthesis</span>). Actively 'switch off' <span class='tooltip-term' data-term-info='The body\'s complex biological response to harmful stimuli'>inflammation</span>: inhibit <span class='tooltip-term' data-term-info='Neutrophil polymorphonuclear leukocytes, a type of white blood cell'>neutrophils</span>, stimulate <span class='tooltip-term' data-term-info='A type of white blood cell that engulfs and digests cellular debris, pathogens, and foreign substances'>macrophage</span> <span class='tooltip-term' data-term-info='Process where phagocytic cells (like macrophages) engulf and clear apoptotic (programmed cell death) cells and debris'>efferocytosis</span>, promote <span class='tooltip-term' data-term-info='The active termination of the inflammatory process and restoration of tissue homeostasis'>resolution</span>. Bind <span class='tooltip-term' data-term-info='A specific G protein-coupled receptor (also known as FPR2/ALX) that mediates the actions of lipoxin A₄ and other pro-resolving mediators'>ALX/FPR2 receptor</span>.">Lipoxins (LXA₄/B₄) - RESOLUTION</div>
+                              </div>
+                         </div>
+                     </div>
+
+                      <!-- CYP450 Pathway -->
+                     <div class="pathway cyp-pathway pathway-content-area" data-pathway-id="cyp">
+                         <h2 class="pathway-title desktop-only">CYP450 Pathway</h2>
+                         <div class="pathway-content">
+                              <div class="sub-pathway">
+                                  <h3>Epoxygenase Branch (EETs)</h3>
+                                 <div class="enzyme node" id="cyp-epox" data-name="CYP Epoxygenases" data-info="<span class='tooltip-term' data-term-info='A large and diverse superfamily of heme-containing enzymes, primarily found in the liver, involved in the metabolism of drugs, toxins, and endogenous compounds'>Cytochrome P450</span> enzymes (e.g., <span class='tooltip-term' data-term-info='Specific subfamilies of CYP450 enzymes, like CYP2C8, CYP2C9, CYP2J2, involved in AA metabolism'>CYP2C, CYP2J</span>). Metabolize <span class='tooltip-term' data-term-info='Arachidonic Acid'>AA</span> to <span class='tooltip-term' data-term-info='A group of epoxy fatty acids derived from arachidonic acid by CYP epoxygenases, with various biological effects, particularly on blood vessels'>epoxyeicosatrienoic acids (EETs)</span>.">
+                                    <span class="enzyme-text">CYP Epoxygenase</span>
+                                </div>
+                                 <div class="connector">↓</div>
+                                 <div class="mediator node" id="eets" data-name="EETs (Epoxyeicosatrienoic acids)" data-info="<span class='tooltip-term' data-term-info='A group of epoxy fatty acids derived from arachidonic acid'>Epoxyeicosatrienoic acids</span>. Generally <span class='tooltip-term' data-term-info='Causing widening of blood vessels'>vasodilatory</span> (often via <span class='tooltip-term' data-term-info='A substance released from the endothelium (lining of blood vessels) that causes hyperpolarization and relaxation of smooth muscle cells, leading to vasodilation'>Endothelium-Derived Hyperpolarizing Factor - EDHF</span>), <span class='tooltip-term' data-term-info='Reducing inflammation'>anti-inflammatory</span>, <span class='tooltip-term' data-term-info='Preventing blood clot formation'>anti-thrombotic</span>. Metabolized (inactivated) by <span class='tooltip-term' data-term-info='An enzyme that hydrolyzes epoxides, including EETs, to their corresponding diols (dihydroxyeicosatrienoic acids, DHETs)'>soluble Epoxide Hydrolase (sEH)</span>. <span class='tooltip-term' data-term-info='Drugs that block the sEH enzyme, thereby increasing the levels and duration of action of EETs'>sEH inhibitors</span> increase EET levels.">EETs</div>
+                             </div>
+                             <div class="sub-pathway">
+                                  <h3>ω-Hydroxylase Branch (HETEs)</h3>
+                                 <div class="enzyme node" id="cyp-hydrox" data-name="CYP ω-Hydroxylases" data-info="<span class='tooltip-term' data-term-info='Cytochrome P450 enzymes, typically from the CYP4A and CYP4F subfamilies, that catalyze the hydroxylation of fatty acids at the omega (ω) or omega-1 (ω-1) carbon atom'>CYP4A, CYP4F family</span>. Metabolize <span class='tooltip-term' data-term-info='Arachidonic Acid'>AA</span> primarily to <span class='tooltip-term' data-term-info='20-Hydroxyeicosatetraenoic acid, an eicosanoid with significant effects on vascular tone and renal function'>20-HETE</span>.">
+                                    <span class="enzyme-text">CYP ω-Hydroxylase</span>
+                                </div>
+                                 <div class="connector">↓</div>
+                                 <div class="mediator node" id="hete20" data-name="20-HETE" data-info="<span class='tooltip-term' data-term-info='20-Hydroxyeicosatetraenoic acid'>20-HETE</span>. Primarily a <span class='tooltip-term' data-term-info='Substance that causes narrowing of blood vessels'>vasoconstrictor</span> (especially in <span class='tooltip-term' data-term-info='Related to the kidneys'>renal</span>/<span class='tooltip-term' data-term-info='Related to the brain'>cerebral</span> <span class='tooltip-term' data-term-info='Small blood vessels'>microvasculature</span>). Regulates <span class='tooltip-term' data-term-info='Blood Pressure'>BP</span>, <span class='tooltip-term' data-term-info='Movement of substances across kidney tubules, affecting urine formation and electrolyte balance'>renal transport</span>.">20-HETE</div>
+                             </div>
+                         </div>
+                     </div>
+                   </div><!-- End pathways-flex -->
+                 </div> <!-- End pathways-container -->
+            </div> <!-- End cascade-diagram-area -->
+        </div> <!-- End diagram-column -->
+
+        <div class="panels-column"> <!-- This will now be part of the main scroll on mobile -->
+            <div class="panels-container">
+                 <!-- New wrapper for mobile side-by-side panels -->
+                <div class="mobile-panels-flex-wrapper">
+                    <!-- Enhanced Physiological Readout Panel -->
+                    <div class="panel readout-panel-main mobile-panel-item">
+                        <h2 class="panel-toggle">
+                            <span class="desktop-text">Physiological Readouts</span>
+                            <span class="mobile-text">Readouts</span>
+                        </h2>
+                        <div class="panel-content">
+                            <div class="readout-grid">
+                                <div class="readout-item" data-key="inflammationVasc" data-explanation="Default explanation.">
+                                    <span class="readout-label">Inflammation (Vascular)</span> 
+                                    <div class="readout-bar-container"><div class="readout-bar"></div></div>
+                                    <span class="readout-status status-normal">Normal</span>
+                                </div>
+                                 <div class="readout-item" data-key="inflammationLeuk" data-explanation="Default explanation.">
+                                    <span class="readout-label">Inflammation (Leukocytes)</span> 
+                                    <div class="readout-bar-container"><div class="readout-bar"></div></div>
+                                    <span class="readout-status status-normal">Normal</span>
+                                </div>
+                                 <div class="readout-item" data-key="resolution" data-explanation="Default explanation.">
+                                    <span class="readout-label">Inflammation Resolution</span> 
+                                    <div class="readout-bar-container"><div class="readout-bar"></div></div>
+                                    <span class="readout-status status-normal">Normal</span>
+                                </div>
+                                <div class="readout-item" data-key="cns" data-explanation="Default explanation.">
+                                    <span class="readout-label">Pain / Fever (CNS)</span> 
+                                    <div class="readout-bar-container"><div class="readout-bar"></div></div>
+                                    <span class="readout-status status-normal">Normal</span>
+                                </div>
+                                <div class="readout-item" data-key="platelets" data-explanation="Default explanation.">
+                                    <span class="readout-label">Platelet Aggregation</span> 
+                                    <div class="readout-bar-container"><div class="readout-bar"></div></div>
+                                    <span class="readout-status status-normal">Normal</span>
+                                </div>
+                                <div class="readout-item" data-key="bronchi" data-explanation="Default explanation.">
+                                    <span class="readout-label">Bronchial Tone</span> 
+                                    <div class="readout-bar-container"><div class="readout-bar"></div></div>
+                                    <span class="readout-status status-normal">Normal</span>
+                                </div>
+                                <div class="readout-item" data-key="cvTone" data-explanation="Default explanation.">
+                                    <span class="readout-label">Cardiovascular Tone</span> 
+                                    <div class="readout-bar-container"><div class="readout-bar"></div></div>
+                                    <span class="readout-status status-balanced">Balanced</span>
+                                </div>
+                                 <div class="readout-item" data-key="stomach" data-explanation="Default explanation.">
+                                    <span class="readout-label">Stomach Protection</span> 
+                                    <div class="readout-bar-container"><div class="readout-bar"></div></div>
+                                    <span class="readout-status status-normal">Normal</span>
+                                </div>
+                                 <div class="readout-item" data-key="kidney" data-explanation="Default explanation.">
+                                    <span class="readout-label">Kidney Function</span> 
+                                    <div class="readout-bar-container"><div class="readout-bar"></div></div>
+                                    <span class="readout-status status-normal">Normal</span>
+                                </div>
+                                 <div class="readout-item" data-key="uterus" data-explanation="Default explanation.">
+                                    <span class="readout-label">Uterine Tone</span> 
+                                    <div class="readout-bar-container"><div class="readout-bar"></div></div>
+                                    <span class="readout-status status-normal">Normal</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AA Cascade Modulators Control Panel -->
+                    <div class="panel aa-modulators-panel mobile-panel-item">
+                        <h2 class="panel-toggle">
+                            <span class="desktop-text">Control Panel (AA Cascade Modulators)</span>
+                            <span class="mobile-text">AA Modulators</span>
+                        </h2>
+                        <div class="panel-content">
+                            <button id="drug-nsaid" title="e.g., Ibuprofen, Naproxen. Inhibits COX-1 & COX-2">
+                                <span class="desktop-text">Apply NSAID</span><span class="mobile-text">NSAID</span>
+                            </button>
+                            <button id="drug-cox2i" title="e.g., Celecoxib. Selectively inhibits COX-2">
+                                <span class="desktop-text">Apply COX-2 Inhibitor</span><span class="mobile-text">Coxib</span>
+                            </button>
+                            <button id="drug-aspirin" title="Irreversibly inhibits COX-1 >> COX-2">
+                                <span class="desktop-text">Apply Aspirin</span><span class="mobile-text">Aspirin</span>
+                            </button>
+                            <button id="drug-csteroid" title="e.g., Prednisone. Inhibits PLA₂, suppresses COX-2 expression">
+                                <span class="desktop-text">Apply Corticosteroid</span><span class="mobile-text">Steroid</span>
+                            </button>
+                            <button id="drug-loxi" title="e.g., Zileuton. Inhibits 5-LOX enzyme">
+                                <span class="desktop-text">Apply 5-LOX Inhibitor</span><span class="mobile-text">5-LOX Inhib.</span>
+                            </button>
+                            <button id="drug-ltra" title="e.g., Montelukast. Blocks CysLT1 receptor">
+                                <span class="desktop-text">Apply Leukotriene Antagonist (LTRA)</span><span class="mobile-text">LTRA</span>
+                            </button>
+                            <button id="reset-btn">
+                                <span class="desktop-text">Reset Simulation</span><span class="mobile-text">Reset</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Other Common Drugs Control Panel -->
+                    <div class="panel other-drugs-panel mobile-panel-item">
+                        <h2 class="panel-toggle">
+                            <span class="desktop-text">Control Panel (Other Common Drug Interactions)</span>
+                            <span class="mobile-text">Other Drugs</span>
+                        </h2>
+                        <div class="panel-content">
+                            <button id="drug-beta-blocker" title="e.g., Propranolol. Blocks beta-adrenergic receptors.">
+                                <span class="desktop-text">Apply Non-selective β-blocker</span><span class="mobile-text">β-Blocker (NS)</span>
+                            </button>
+                            <button id="drug-ace-inhibitor" title="e.g., Lisinopril. Inhibits Angiotensin-Converting Enzyme.">
+                                <span class="desktop-text">Apply ACE Inhibitor</span><span class="mobile-text">ACE Inhib.</span>
+                            </button>
+                            <button id="drug-ccb" title="e.g., Amlodipine (Dihydropyridine). Blocks L-type calcium channels.">
+                                <span class="desktop-text">Apply Calcium Channel Blocker</span><span class="mobile-text">CaCB</span>
+                            </button>
+                        </div>
+                    </div>
+                </div> <!-- End mobile-panels-flex-wrapper -->
+             </div> <!-- End panels-container -->
+         </div> <!-- End panels-column -->
+     </div> <!-- End main-container -->
+
+     <script src="script.js"></script>
+</body>
+</html>
