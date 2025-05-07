@@ -231,7 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function showMainTooltip(nodeElement, event, nameOverride, infoOverride) {
-        if (nodeElement.classList.contains('inhibited') && !nodeElement.classList.contains('info-icon')) return; // Allow info icons on inhibited items
+        // Check if it's a drug button and if so, use its specific data attribute
+        const drugInfo = nodeElement.dataset.drugInfo;
+        const nodeName = nodeElement.querySelector('.desktop-text')?.textContent.trim() || nodeElement.textContent.trim();
+
+        if (nodeElement.classList.contains('inhibited') && !nodeElement.classList.contains('info-icon')) return;
 
         if (isMobile && activeTooltipNode && activeTooltipNode !== nodeElement) {
             hideMainTooltip(true);
@@ -242,7 +246,10 @@ document.addEventListener('DOMContentLoaded', () => {
         let name = nameOverride;
         let info = infoOverride;
 
-        if (nodeElement.classList.contains('info-icon')) {
+        if (drugInfo) { // If it's a drug button with data-drug-info
+            name = nodeName || 'Drug Information';
+            info = drugInfo;
+        } else if (nodeElement.classList.contains('info-icon')) {
             const readoutItem = nodeElement.closest('.readout-item');
             name = readoutItem?.querySelector('.readout-label')?.textContent.trim() || 'Details';
             info = readoutItem?.dataset.explanation || 'No details available.';
@@ -251,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
              info = infoOverride || nodeElement.dataset.info || nodeElement.dataset.termInfo || nodeElement.dataset.explanation || 'No details available.';
         }
 
-        mainTooltip.innerHTML = `<h3>${name}</h3><p>${info}</p>`;
+        mainTooltip.innerHTML = `<h3>${name}</h3><div>${info}</div>`; // Use div for info for better styling if needed
 
         mainTooltip.style.visibility = 'hidden'; mainTooltip.style.opacity = '0'; mainTooltip.style.left = '-9999px';
         // Force reflow to get correct dimensions
@@ -268,17 +275,15 @@ document.addEventListener('DOMContentLoaded', () => {
         let x, y;
 
         if (isMobile) {
-            // For info icons, position relative to the icon itself.
-            // For other nodes, try to center above/below.
-            if (nodeElement.classList.contains('info-icon')) {
+            if (nodeElement.classList.contains('info-icon') || nodeElement.tagName === 'BUTTON') { // Treat buttons similarly to info-icons for mobile positioning
                  x = nodeRect.left + (nodeRect.width / 2) - (tooltipCurrentWidth / 2);
-                 y = nodeRect.top - tooltipCurrentHeight - 10; // Position above icon
-                 if (y < 10) { // If not enough space above, try below
+                 y = nodeRect.top - tooltipCurrentHeight - 10; 
+                 if (y < 10 || (nodeElement.tagName === 'BUTTON' && y < (nodeRect.top - 50))) { // If not enough space above, or it's a button (prefer below for buttons)
                      y = nodeRect.bottom + 10;
                  }
-            } else {
+            } else { // Original logic for diagram nodes
                 x = nodeRect.left + (nodeRect.width / 2) - (tooltipCurrentWidth / 2);
-                y = nodeRect.bottom + 10; // Default below node
+                y = nodeRect.bottom + 10; 
                 if (y + tooltipCurrentHeight > viewportHeight - 10) { y = nodeRect.top - tooltipCurrentHeight - 10; }
             }
 
@@ -286,11 +291,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (x < 10) x = 10;
             if (x + tooltipCurrentWidth > viewportWidth - 10) { x = viewportWidth - tooltipCurrentWidth - 10; }
             
-            // Convert to page coordinates if scrolling is involved (though we aim for less)
             x += window.scrollX; 
             y += window.scrollY;
 
-        } else { // Desktop logic remains
+        } else { // Desktop logic
             const scrollX = window.scrollX;
             const scrollY = window.scrollY;
             x = event.pageX + 15;
@@ -669,5 +673,78 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // window.addEventListener('resize', checkPCLayout);
     // checkPCLayout(); 
+
+    // --- Add Event Listeners for Drug Buttons ---
+    const allDrugButtons = document.querySelectorAll('.aa-modulators-panel .panel-content button, .other-drugs-panel .panel-content button');
+
+    allDrugButtons.forEach(button => {
+        // Skip the reset button if it's caught by this selector
+        if (button.id === 'reset-btn' || !button.dataset.drugInfo) return;
+
+        const buttonText = button.querySelector('.desktop-text')?.textContent.trim() || button.textContent.trim();
+        const drugInfoText = button.dataset.drugInfo;
+
+        if (isMobile) {
+            button.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent simulation trigger if any
+                // Check if the click target is a tooltip-term inside the button's current tooltip
+                const mainTooltipVisible = mainTooltip.style.visibility === 'visible';
+                const clickIsInsideActiveTooltipTerm = mainTooltipVisible && mainTooltip.contains(event.target) && event.target.closest('.tooltip-term');
+
+                if (clickIsInsideActiveTooltipTerm) {
+                    // Allow nested tooltip logic to handle this
+                    return;
+                }
+
+                if (activeTooltipNode === button && mainTooltipVisible) {
+                    hideMainTooltip(true);
+                } else {
+                    showMainTooltip(button, event, buttonText, drugInfoText);
+                }
+            });
+        } else {
+            button.addEventListener('mouseenter', (event) => {
+                // Pass null for nameOverride and infoOverride, showMainTooltip will pick from data-drug-info
+                showMainTooltip(button, event, null, null);
+            });
+            button.addEventListener('mouseleave', () => {
+                hideMainTooltip();
+            });
+        }
+    });
+
+    // Ensure the document click listener for hiding tooltips is robust:
+    document.addEventListener('click', (event) => {
+        if (mainTooltip.style.visibility === 'visible') {
+            // Check if the click is on the active node/button OR inside the main tooltip itself
+            const isClickOnActiveElement = activeTooltipNode && activeTooltipNode.contains(event.target);
+            const isClickInsideTooltip = mainTooltip.contains(event.target);
+
+            if (!isClickOnActiveElement && !isClickInsideTooltip) {
+                hideMainTooltip(true);
+            }
+        }
+    });
+
+    // Ensure mainTooltip click for nested terms is already present and correct
+    mainTooltip.addEventListener('click', function(event) { // 'this' refers to mainTooltip
+        const term = event.target.closest('.tooltip-term');
+        if (term && this.contains(term)) { // Ensure term is a child of mainTooltip
+            event.stopPropagation();
+            const wasActive = term.classList.contains('active-nested-tooltip');
+            // Deactivate any currently active nested tooltip within this main tooltip
+            this.querySelectorAll('.tooltip-term.active-nested-tooltip').forEach(activeTerm => {
+                if (activeTerm !== term) { // Don't remove from the one just clicked if it was already active (toggle behavior)
+                    activeTerm.classList.remove('active-nested-tooltip');
+                }
+            });
+            // Toggle the current term
+            if (wasActive) {
+                term.classList.remove('active-nested-tooltip');
+            } else {
+                term.classList.add('active-nested-tooltip');
+            }
+        }
+    });
 
 }); // End DOMContentLoaded
