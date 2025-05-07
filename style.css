@@ -859,27 +859,3 @@ body:not(.mobile) .node:hover:not(.inhibited) {
     .tooltip-term::after { font-size: 0.75em; padding: 3px 6px; max-width: 200px; }
 
 }
-
-/* --- style.css (potential addition or modification) --- */
-#main-tooltip div p, /* If your info string contains <p> tags from a WYSIWYG or similar */
-#main-tooltip div { /* General styling for the info container */
-    margin: 0;
-    line-height: 1.5; /* Adjust as needed */
-}
-
-#main-tooltip strong {
-    color: var(--accent-color); /* Or another highlight color */
-    display: block; /* Make PK/PD Notes and Mechanism start on new line if not using <br> */
-    margin-top: 5px;
-}
-#main-tooltip strong:first-child {
-    margin-top: 0;
-}
-
-/* Style for buttons when tooltip is active on mobile */
-.panel-content button.mobile-tooltip-active {
-    /* Similar to .node.mobile-tooltip-active or a distinct style */
-    box-shadow: 0 0 6px var(--primary-color), 0 0 9px var(--primary-color);
-    border: 2px solid var(--primary-color);
-    transform: scale(1.02); /* Slight scale up */
-}
