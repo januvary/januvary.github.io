@@ -224,14 +224,14 @@ document.addEventListener('DOMContentLoaded', () => {
    function updateReadoutVisuals(readoutElements, statusText, statusClass, explanationText) {
         if (!readoutElements || !readoutElements.status || !readoutElements.bar || !readoutElements.item) return;
         readoutElements.status.textContent = statusText;
-        readoutElements.item.className = `readout-item ${statusClass}`; // Ensure base class is present
-        readoutElements.status.className = `readout-status ${statusClass}`; // Ensure base class is present
+        readoutElements.item.className = readoutElements.item.className.split(' ').filter(cls => !cls.startsWith('status-')).join(' ') + ' ' + statusClass;
+        readoutElements.status.className = readoutElements.status.className.split(' ').filter(cls => !cls.startsWith('status-')).join(' ') + ' ' + statusClass;
         readoutElements.item.setAttribute('data-explanation', explanationText || "No specific explanation available.");
    }
 
 
     function showMainTooltip(nodeElement, event, nameOverride, infoOverride) {
-        if (nodeElement.classList.contains('inhibited') && !nodeElement.classList.contains('info-icon')) return; // Allow info icons on inhibited items
+        if (nodeElement.classList.contains('inhibited') && !nodeElement.classList.contains('info-icon')) return;
 
         if (isMobile && activeTooltipNode && activeTooltipNode !== nodeElement) {
             hideMainTooltip(true);
@@ -239,14 +239,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         clearTimeout(tooltipHideTimeout);
 
-        let name = nameOverride;
-        let info = infoOverride;
+        let name, info;
 
         if (nodeElement.classList.contains('info-icon')) {
             const readoutItem = nodeElement.closest('.readout-item');
             name = readoutItem?.querySelector('.readout-label')?.textContent.trim() || 'Details';
             info = readoutItem?.dataset.explanation || 'No details available.';
-        } else {
+        } else if (nodeElement.dataset.drugInfo) { // Check for drug buttons first
+            name = nameOverride || nodeElement.title || 'Drug Details'; // Use the button's existing title attribute
+            info = infoOverride || nodeElement.dataset.drugInfo;
+        } else { // Existing logic for other nodes and terms
              name = nameOverride || nodeElement.dataset.name || nodeElement.textContent.trim() || 'N/A';
              info = infoOverride || nodeElement.dataset.info || nodeElement.dataset.termInfo || nodeElement.dataset.explanation || 'No details available.';
         }
@@ -625,12 +627,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const button = controls[buttonIdCamel];
         if (button) {
+            // Listener for applying drug effect
             button.addEventListener('click', () => applyDrugEffect(
                 drugKey,
                 drugEffects[drugKey].inhibited,
                 drugEffects[drugKey].blocked,
                 drugEffects[drugKey].readouts
             ));
+
+            // Add tooltip listeners if data-drug-info exists
+            if (button.dataset.drugInfo) {
+                if (isMobile) {
+                    button.addEventListener('click', (event) => {
+                        // This click listener for tooltips runs alongside the one for applyDrugEffect.
+                        // On mobile, clicking a drug button will both apply its effect and show/toggle its tooltip.
+                        event.stopPropagation(); 
+                        if (activeTooltipNode === button && mainTooltip.style.visibility === 'visible') {
+                            hideMainTooltip(true);
+                        } else {
+                            showMainTooltip(button, event);
+                        }
+                    });
+                } else { // Desktop
+                    button.addEventListener('mouseenter', (event) => showMainTooltip(button, event));
+                    button.addEventListener('mouseleave', () => hideMainTooltip());
+                }
+            }
         } else {
             console.warn("Button not found for drug:", drugKey, "Expected key in controls:", buttonIdCamel);
         }
