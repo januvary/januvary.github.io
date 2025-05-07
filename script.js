@@ -427,13 +427,42 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // ... (Pathway Selection Logic, Panel Accordion Logic - if any remains relevant) ...
 
+    // ***** MOVE drugEffects DEFINITION HERE *****
+    const drugEffects = {
+        nsaid: {
+            inhibited: ['cox1', 'cox2'], blocked: ['pgh2', 'pge2', 'pgd2', 'pgi2', 'txa2'],
+            readouts: {
+                inflammationVasc: { text: 'Reduced', statusClass: 'status-reduced', explanation: "Blocks <span class='tooltip-term' data-term-info='Cyclooxygenase enzymes 1 and 2'>COX-1/2</span>, reducing <span class='tooltip-term' data-term-info='Widening of blood vessels'>vasodilatory</span> <span class='tooltip-term' data-term-info='Prostaglandins'>PGs</span> (<span class='tooltip-term' data-term-info='Prostaglandin E₂'>PGE₂</span>, <span class='tooltip-term' data-term-info='Prostacyclin or PGI₂'>PGI₂</span>)." },
+                inflammationLeuk: { text: 'Increased', statusClass: 'status-increased', explanation: "Unaffected <span class='tooltip-term' data-term-info='Leukotriene B₄, a chemoattractant'>LTB₄</span> synthesis; potential <span class='tooltip-term' data-term-info='Metabolic redirection of a substrate when one pathway is blocked'>substrate shunting</span> towards <span class='tooltip-term' data-term-info='Lipoxygenase pathway'>LOX</span> pathway." },
+                resolution: { text: 'Suppressed', statusClass: 'status-suppressed', explanation: "Blocks <span class='tooltip-term' data-term-info='Prostaglandin D₂'>PGD₂</span>/<span class='tooltip-term' data-term-info='Prostaglandin E₂'>PGE₂</span> derived <span class='tooltip-term' data-term-info='Signals that promote the end of inflammation'>resolution signals</span>. May impair <span class='tooltip-term' data-term-info='Lipoxins, pro-resolving mediators'>Lipoxin</span> generation." },
+                cns: { text: 'Reduced', statusClass: 'status-reduced', explanation: "Blocks central/peripheral <span class='tooltip-term' data-term-info='Prostaglandin E₂'>PGE₂</span> synthesis involved in <span class='tooltip-term' data-term-info='Elevated body temperature'>fever</span> and <span class='tooltip-term' data-term-info='Increased pain sensitivity'>pain sensitization</span>." },
+                platelets: { text: 'Reduced', statusClass: 'status-reduced', explanation: "Blocks <span class='tooltip-term' data-term-info='Platelet (blood clotting cell) specific Cyclooxygenase-1'>platelet COX-1</span>, reducing pro-aggregatory <span class='tooltip-term' data-term-info='Thromboxane A₂, promotes platelet aggregation'>TXA₂</span>." },
+                bronchi: { text: 'Constricted', statusClass: 'status-constricted', explanation: "Blocks <span class='tooltip-term' data-term-info='Airway-widening'>bronchodilatory</span> <span class='tooltip-term' data-term-info='Prostaglandins'>PGs</span>; <span class='tooltip-term' data-term-info='Leukotrienes, often bronchoconstricting'>LTs</span> may dominate (risk in <span class='tooltip-term' data-term-info='Aspirin-Exacerbated Respiratory Disease, a condition where aspirin/NSAIDs worsen asthma/nasal polyps due to leukotriene overproduction'>AERD</span>)." },
+                cvTone: { text: 'Vasoconstricted', statusClass: 'status-vasoconstricted', explanation: "Blocks vasodilatory <span class='tooltip-term' data-term-info='Prostacyclin'>PGI₂</span>/<span class='tooltip-term' data-term-info='Prostaglandin E₂'>PGE₂</span>; <span class='tooltip-term' data-term-info='Effects on the kidneys'>Renal effects</span> & unopposed <span class='tooltip-term' data-term-info='20-Hydroxyeicosatetraenoic acid, a vasoconstrictor'>20-HETE</span> (if active) contribute to increased tone/<span class='tooltip-term' data-term-info='Blood Pressure'>BP</span>." },
+                stomach: { text: 'Reduced', statusClass: 'status-reduced', explanation: "Blocks <span class='tooltip-term' data-term-info='Stomach-protective'>protective</span> <span class='tooltip-term' data-term-info='Prostaglandins'>PGs</span> (<span class='tooltip-term' data-term-info='Prostaglandin E₂'>PGE₂</span>/<span class='tooltip-term' data-term-info='Prostacyclin'>PGI₂</span>) via <span class='tooltip-term' data-term-info='Cyclooxygenase-1'>COX-1</span> inhibition." },
+                kidney: { text: 'Impaired', statusClass: 'status-impaired', explanation: "Blocks <span class='tooltip-term' data-term-info='Cyclooxygenase 1 and 2'>COX-1/2</span> derived <span class='tooltip-term' data-term-info='Prostaglandins'>PGs</span> essential for <span class='tooltip-term' data-term-info='Blood flow to the kidneys'>renal blood flow</span> and function, potentially leading to <span class='tooltip-term' data-term-info='Sodium and water buildup'>Na⁺/H₂O retention</span>." },
+                uterus: { text: 'Reduced', statusClass: 'status-reduced', explanation: "Blocks <span class='tooltip-term' data-term-info='Prostaglandins'>PGs</span> involved in <span class='tooltip-term' data-term-info='Uterine muscle contractions'>uterine contractions</span>. Used to treat <span class='tooltip-term' data-term-info='Painful menstruation'>dysmenorrhea</span>." }
+            }
+        },
+        cox2i: { /* ... cox2i details ... */ },
+        aspirin: { /* ... aspirin details ... */ },
+        csteroid: { /* ... csteroid details ... */ },
+        loxi: { /* ... loxi details ... */ },
+        ltra: { /* ... ltra details ... */ },
+        betaBlocker: { /* ... betaBlocker details ... */ },
+        aceInhibitor: { /* ... aceInhibitor details ... */ },
+        ccb: { /* ... ccb details ... */ }
+        // ... (Ensure all drug effect definitions are complete here from your original script) ...
+    };
+
     triggerBtn.addEventListener('click', triggerCascade);
-    controls.resetBtn.addEventListener('click', resetSimulation);
+    if(controls.resetBtn) controls.resetBtn.addEventListener('click', resetSimulation);
 
     // Setup for Drug Buttons (Action + Tooltip Logic)
+    // This loop should now be AFTER drugEffects is defined.
     for (const drugKey in drugEffects) {
-        // Construct buttonIdCamel correctly as in the original script
         let buttonIdCamel = `drug${drugKey.charAt(0).toUpperCase() + drugKey.slice(1)}`;
+        // ... (manual corrections for buttonIdCamel if any) ...
         if (drugKey === "cox2i") buttonIdCamel = "drugCox2i"; 
         else if (drugKey === "csteroid") buttonIdCamel = "drugCsteroid";
         else if (drugKey === "loxi") buttonIdCamel = "drugLoxi";
@@ -447,31 +476,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const button = controls[buttonIdCamel];
 
         if (button) {
-            button.longPressDidOccur = false; // Initialize flag on the button element
-            button.longPressTimer = null;    // Initialize timer reference
+            button.longPressDidOccur = false; 
+            button.longPressTimer = null;    
 
             if (isMobile) {
                 button.addEventListener('touchstart', (e) => {
-                    button.longPressDidOccur = false; // Reset on new touch
+                    button.longPressDidOccur = false; 
                     clearTimeout(button.longPressTimer);
-
+                    
                     const buttonText = button.querySelector('.mobile-text')?.textContent.trim() || button.querySelector('.desktop-text')?.textContent.trim() || button.textContent.trim();
                     const drugInfoText = button.dataset.drugInfo;
 
                     button.longPressTimer = setTimeout(() => {
                         button.longPressDidOccur = true;
                         showMainTooltip(button, e, buttonText, drugInfoText); 
-                    }, 500); // 500ms for long press
-                });
+                    }, 500); 
+                }, { passive: true });
 
                 button.addEventListener('touchend', () => {
                     clearTimeout(button.longPressTimer);
-                    // longPressDidOccur flag remains true if timer fired, until click handler resets it.
                 });
 
                 button.addEventListener('touchmove', () => {
-                    clearTimeout(button.longPressTimer); // Cancel long press if finger moves
-                    // Optional: button.longPressDidOccur = false; // if dragging should not count as precursor to long-press-click
+                    clearTimeout(button.longPressTimer); 
                 });
             } else { // Desktop: Tooltip on hover
                 button.addEventListener('mouseenter', (event) => {
@@ -484,43 +511,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            // Click listener for APPLYING DRUG EFFECT
             button.addEventListener('click', (event) => {
                 if (isMobile) {
                     if (button.longPressDidOccur) { 
                         event.preventDefault();    
-                        button.longPressDidOccur = false; // Reset flag
-                        // Tooltip is already shown by long press. A tap on button itself while tooltip is active is handled next.
-                        // If this click event is on the button and its tooltip is active, this tap should ideally do nothing more or hide it.
-                        // The `activeTooltipNode` check below might handle hiding.
+                        button.longPressDidOccur = false; 
                         return; 
                     }
-
-                    // If it was a short tap, AND a tooltip for THIS button is ALREADY visible (e.g. from a very recent long press)
-                    // This tap should hide the tooltip and not apply the drug.
                     if (activeTooltipNode === button && mainTooltip.style.visibility === 'visible') {
                          hideMainTooltip(true);
                          event.preventDefault(); 
-                         button.longPressDidOccur = false; // Ensure flag is reset
+                         button.longPressDidOccur = false; 
                          return;
                     }
                 }
                 
-                // If not mobile, or if mobile and it was a clear short tap (no long press, no active tooltip for this button to close),
-                // then apply the drug effect.
                 applyDrugEffect(
-                drugKey,
-                drugEffects[drugKey].inhibited,
-                drugEffects[drugKey].blocked,
-                drugEffects[drugKey].readouts
+                    drugKey,
+                    drugEffects[drugKey].inhibited,
+                    drugEffects[drugKey].blocked,
+                    drugEffects[drugKey].readouts
                 );
-                button.longPressDidOccur = false; // Ensure flag is reset after any click processing
+                button.longPressDidOccur = false; 
             });
         } else {
             console.warn("Button not found for drug:", drugKey, "Expected ID in controls:", buttonIdCamel);
         }
     }
 
-    // ... (Initial setup, resetSimulation call, etc.) ...
-    resetSimulation();
+    // ... (Initial setup calls: pathway selection defaults, resetSimulation) ...
+    if (isMobile) {
+        pathwaySelectButtons.forEach((btn, index) => {
+             btn.classList.toggle('active', index === 0);
+        });
+        pathwayContentAreas.forEach((area, index) => {
+             area.classList.toggle('active-pathway-area', index === 0);
+        });
+    }
+    resetSimulation(); 
+
 }); // End DOMContentLoaded
