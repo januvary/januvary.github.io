@@ -388,6 +388,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }); */
+    // Add click listeners for readout items on mobile for their explanations
+    if (isMobile) {
+        document.querySelectorAll('.readout-item').forEach(item => {
+            item.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent click from bubbling up, e.g., to document listener
+                const readoutName = item.querySelector('.readout-label')?.textContent.trim() || 'Readout Details';
+                const readoutInfo = item.dataset.explanation;
+
+                if (activeTooltipNode === item && mainTooltip.style.visibility === 'visible') {
+                    hideMainTooltip(true);
+                } else {
+                    showMainTooltip(item, event, readoutName, readoutInfo);
+                }
+            });
+        });
+    }
 
 
     if (!isMobile) {
@@ -624,31 +640,59 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (drugKey === "aceInhibitor") buttonIdCamel = "drugAceInhibitor";
         else if (drugKey === "ccb") buttonIdCamel = "drugCcb";
 
-
         const button = controls[buttonIdCamel];
         if (button) {
-            // Listener for applying drug effect
-            button.addEventListener('click', () => applyDrugEffect(
-                drugKey,
-                drugEffects[drugKey].inhibited,
-                drugEffects[drugKey].blocked,
-                drugEffects[drugKey].readouts
-            ));
+            if (isMobile) {
+                const LONG_PRESS_DURATION = 500; // milliseconds
+                let pressTimer = null;
+                let isLongPress = false;
 
-            // Add tooltip listeners if data-drug-info exists
-            if (button.dataset.drugInfo) {
-                if (isMobile) {
-                    button.addEventListener('click', (event) => {
-                        // This click listener for tooltips runs alongside the one for applyDrugEffect.
-                        // On mobile, clicking a drug button will both apply its effect and show/toggle its tooltip.
-                        event.stopPropagation(); 
-                        if (activeTooltipNode === button && mainTooltip.style.visibility === 'visible') {
-                            hideMainTooltip(true);
+                button.addEventListener('touchstart', (event) => {
+                    isLongPress = false;
+                    // Clear any existing timer from a previous interaction that might not have completed
+                    clearTimeout(pressTimer);
+                    pressTimer = setTimeout(() => {
+                        if (button.dataset.drugInfo) {
+                            isLongPress = true;
+                            showMainTooltip(button, event); // Show tooltip on long press
                         } else {
-                            showMainTooltip(button, event);
+                             isLongPress = false; // No tooltip to show, so not a long press action
                         }
-                    });
-                } else { // Desktop
+                    }, LONG_PRESS_DURATION);
+                });
+
+                button.addEventListener('touchend', (event) => {
+                    clearTimeout(pressTimer); // Clear the timer
+                    if (!isLongPress) { // If not a long press, it's a quick press
+                        applyDrugEffect(
+                            drugKey,
+                            drugEffects[drugKey].inhibited,
+                            drugEffects[drugKey].blocked,
+                            drugEffects[drugKey].readouts
+                        );
+                        if (button.dataset.drugInfo) {
+                           hideMainTooltip(true); // Hide tooltip if a quick action occurs
+                        }
+                    }
+                    // If isLongPress is true, the tooltip was shown by the timer, so do nothing here for drug effect.
+                });
+
+                button.addEventListener('touchmove', (event) => {
+                    clearTimeout(pressTimer); // Cancel long press if finger moves
+                    isLongPress = false; // Reset flag as it's no longer a candidate for long press
+                });
+
+            } else { // Desktop interactions
+                // Click to apply drug effect
+                button.addEventListener('click', () => applyDrugEffect(
+                    drugKey,
+                    drugEffects[drugKey].inhibited,
+                    drugEffects[drugKey].blocked,
+                    drugEffects[drugKey].readouts
+                ));
+
+                // Mouseenter/mouseleave for tooltip if drugInfo exists
+                if (button.dataset.drugInfo) {
                     button.addEventListener('mouseenter', (event) => showMainTooltip(button, event));
                     button.addEventListener('mouseleave', () => hideMainTooltip());
                 }
